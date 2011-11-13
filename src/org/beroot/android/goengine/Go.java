@@ -588,7 +588,7 @@ public class Go
         int s2 = _stringNumber[direction];
         addNeighbor(s, direction);
         addNeighbor(s2, pos);
-        markString(north(pos));
+        markString(direction);
       }
       else if (unmarkedColorString(direction, color))
       {
