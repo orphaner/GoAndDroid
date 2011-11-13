@@ -12,7 +12,6 @@
         <item>6.5</item>
         <item>7.5</item>
     </string-array>
-
     <string-array name="handicapList">
         <item>None</item>
         <item>2</item>
