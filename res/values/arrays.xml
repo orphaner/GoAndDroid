@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="boardSizeList">
+        <item >9x9</item>
+        <item >13x13</item>
+        <item >19x19</item>
+    </string-array>
+    <string-array name="komiList">
+        <item >None</item>
+        <item >5.5</item>
+        <item >6.5</item>
+        <item >7.5</item>
+    </string-array>
+
+    
+</resources>
