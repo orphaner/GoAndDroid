@@ -23,7 +23,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class BoardView2 extends View
+public class BoardView extends View
 {
   private static final String TAG = "beroot";
 
@@ -36,6 +36,7 @@ public class BoardView2 extends View
   private static int _gobanWidth;
   private float _activeCellWidth;
   private static Paint _linePaint;
+  private static Paint _linePaintBig;
   private static int _globalCoef;
   private static int _lineWidth;
   private static int _backgroundWidth;
@@ -65,15 +66,28 @@ public class BoardView2 extends View
    * @param pContext
    * @param pAttributeSet
    */
-  public BoardView2(Context pContext, AttributeSet pAttributeSet)
+  public BoardView(Context context)
   {
-    super(pContext, pAttributeSet);
-
+    super(context);
     _resources = getResources();
-    _gestureDetector = new GestureDetector(pContext, new GobanGestureListener());
-    _gobanSize = GobanSize.G13;
+    _gestureDetector = new GestureDetector(context, new GobanGestureListener());
+    setGobanSize(GobanSize.G13);
+  }
+
+  public BoardView(Context context, AttributeSet attrs)
+  {
+    super(context, attrs);
+    _resources = getResources();
+    _gestureDetector = new GestureDetector(context, new GobanGestureListener());
+    setGobanSize(GobanSize.G13);
+  }
+
+  public void setGobanSize(GobanSize gobanSize)
+  {
+    _gobanSize = gobanSize;
     _go = new Go(_gobanSize.getSize());
     initDrawObjects();
+    postInvalidate();
   }
 
   /**
@@ -92,7 +106,7 @@ public class BoardView2 extends View
     options.inSampleSize = 1;
     options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-    float desiredScale = 13f / _gobanSize.getSize();
+    float desiredScale = 16.5f / _gobanSize.getSize();
     Matrix matrix = new Matrix();
     matrix.postScale(desiredScale, desiredScale);
 
@@ -108,6 +122,12 @@ public class BoardView2 extends View
     _linePaint = new Paint();
     _linePaint.setAntiAlias(true);
     _linePaint.setARGB(255, 0, 0, 0);
+    _linePaint.setStrokeWidth(0.8f);
+    
+    _linePaintBig = new Paint();
+    _linePaintBig.setAntiAlias(true);
+    _linePaintBig.setARGB(255, 0, 0, 0);
+    _linePaintBig.setStrokeWidth(2f);
   }
 
   // --------------------------------------------------------------------------
@@ -181,10 +201,13 @@ public class BoardView2 extends View
 
     // Tracé des lignes
     Log.d(TAG, "Tracé des lignes");
+    
+    boolean isFirstOrLast;
     for (int i = 0; i < _gobanSize.getSize(); i++)
     {
-      canvas.drawLine((i * _globalCoef) + _globalPadding, _globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, _linePaint);
-      canvas.drawLine(_globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (i * _globalCoef) + _globalPadding, _linePaint);
+      isFirstOrLast = (i == 0 || i == _gobanSize.getSize() - 1);
+      canvas.drawLine((i * _globalCoef) + _globalPadding, _globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (isFirstOrLast ? _linePaintBig : _linePaint));
+      canvas.drawLine(_globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (i * _globalCoef) + _globalPadding, (isFirstOrLast ? _linePaintBig : _linePaint));
     }
 
     // Tracé des hoshis
@@ -196,7 +219,7 @@ public class BoardView2 extends View
 
     // Tracé des pierres
     Log.d(TAG, "Tracé des pierres");
-    float reduc = _globalCoef / 2.2f;
+    float reduc = _globalCoef / 1.8f;
 
     for (int i = _go.boardMin; i < _go.boardMax; i++)
     {

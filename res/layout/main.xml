@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<org.beroot.android.BoardView  
+<org.beroot.android.BoardView2  
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     />

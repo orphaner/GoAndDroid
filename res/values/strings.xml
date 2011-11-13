@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Android1Activity!</string>
-    <string name="app_name">Android1</string>
+    <string name="app_name">Go And Droid</string>
+    <string name="homeNewGame">New Game</string>
+    <string name="homeMyGames">My Games</string>
+    <string name="homeProblems">Problems</string>
+    <string name="newGameBoardSize">Board Size</string>
+    <string name="newGameStart">Start Game</string>
+    <string name="newGameBlack">Black</string>
+    <string name="newGameWhite">White</string>
+    <string name="newGameRightArrow">></string>
+    <string name="newGameKomi">Komi</string>
+    <string name="newGameBlackName">Black Name</string>
+    <string name="newGameWhiteName">White Name</string>
+    <string name="newGameHandicap">Handicap</string>
 </resources>
