@@ -42,7 +42,6 @@
             android:layout_weight="1"
             android:padding="2dp"
             android:src="@drawable/blackstone" />
-
     </LinearLayout>
 
     <org.beroot.android.BoardView

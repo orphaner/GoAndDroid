@@ -21,6 +21,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 public class BoardView extends View
@@ -30,32 +31,43 @@ public class BoardView extends View
   // --------------------------------------------------------------------------
   // Objets utilisés dans la phase de doPaint()
   // --------------------------------------------------------------------------
-  private static final Paint _gobanBackgroundImage = new Paint();
-  private static Bitmap _whiteStoneImage;
-  private static Bitmap _blackStoneImage;
-  private static int _gobanWidth;
+  private final Paint _gobanBackgroundImage = new Paint();
+  private Bitmap _whiteStoneImage;
+  private Bitmap _blackStoneImage;
+  private int _gobanWidth;
   private float _activeCellWidth;
-  private static Paint _linePaint;
-  private static Paint _linePaintBig;
-  private static int _globalCoef;
-  private static int _lineWidth;
-  private static int _backgroundWidth;
-  private static int _globalPadding;
+  private Paint _linePaint;
+  private Paint _linePaintBig;
+  private int _globalCoef;
+  private int _lineWidth;
+  private int _backgroundWidth;
+  private int _globalPadding;
 
   // --------------------------------------------------------------------------
   // Objets généraux
   // --------------------------------------------------------------------------
-  private static Resources _resources;
-  private final GestureDetector _gestureDetector;
+  private Resources _resources;
+  private GestureDetector _gestureDetector;
+  private ScaleGestureDetector _scaleDetector;
 
-  private static int _moveCount = 0;
+  private float mPosX;
+  private float mPosY;
+
+  private float mLastTouchX;
+  private float mLastTouchY;
+
+  private static final int INVALID_POINTER_ID = -1;
+
+  private int mActivePointerId = INVALID_POINTER_ID;
+  private float mScaleFactor = 1.0f;
 
   // --------------------------------------------------------------------------
   // Objets de jeu
   // --------------------------------------------------------------------------
-  private static GobanSize _gobanSize;
-  private static Go _go;
-  private static List<Point> _plays = new ArrayList<Point>();
+  private GobanSize _gobanSize;
+  private Go _go;
+  private int _moveCount = 0;
+  private List<Point> _plays = new ArrayList<Point>();
 
   // --------------------------------------------------------------------------
   // Initialisation
@@ -69,17 +81,21 @@ public class BoardView extends View
   public BoardView(Context context)
   {
     super(context);
-    _resources = getResources();
-    _gestureDetector = new GestureDetector(context, new GobanGestureListener());
-    setGobanSize(GobanSize.G13);
+    init(context);
   }
 
   public BoardView(Context context, AttributeSet attrs)
   {
     super(context, attrs);
+    init(context);
+  }
+
+  private void init(Context context)
+  {
     _resources = getResources();
     _gestureDetector = new GestureDetector(context, new GobanGestureListener());
-    setGobanSize(GobanSize.G13);
+    _scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
+    setGobanSize(GobanSize.G19);
   }
 
   public void setGobanSize(GobanSize gobanSize)
@@ -123,7 +139,7 @@ public class BoardView extends View
     _linePaint.setAntiAlias(true);
     _linePaint.setARGB(255, 0, 0, 0);
     _linePaint.setStrokeWidth(0.8f);
-    
+
     _linePaintBig = new Paint();
     _linePaintBig.setAntiAlias(true);
     _linePaintBig.setARGB(255, 0, 0, 0);
@@ -133,24 +149,6 @@ public class BoardView extends View
   // --------------------------------------------------------------------------
   // Phase de jeu
   // --------------------------------------------------------------------------
-  private final class GobanGestureListener extends GestureDetector.SimpleOnGestureListener
-  {
-    public boolean onSingleTapUp(MotionEvent e)
-    {
-      Point p = coord2Point(e.getX(), e.getY());
-      if (p.x < _gobanSize.getSize() && p.y < _gobanSize.getSize())
-      {
-        Log.d(TAG, "pressed - x: " + e.getX() + " - y: " + e.getY());
-        Log.d(TAG, "point   - x: " + p.x + " - y: " + p.y);
-        Log.d(TAG, "traced  - x: " + (int) (((p.x) * _globalCoef) + _globalPadding) + " - y: " + (int) (((p.y) * _globalCoef) + _globalPadding));
-        if (addStone(p))
-        {
-          postInvalidate();
-        }
-      }
-      return true;
-    }
-  }
 
   private boolean addStone(Point p)
   {
@@ -176,13 +174,15 @@ public class BoardView extends View
     return _moveCount % 2 == 0;
   }
 
-  private Point coord2Point(final float x, final float y)
+  @Override
+  public void onDraw(Canvas canvas)
   {
-    return new Point((int) (x / (_activeCellWidth)), (int) (y / (_activeCellWidth)));
-  }
+    super.onDraw(canvas);
 
-  private void doDraw(Canvas canvas)
-  {
+    canvas.save();
+    canvas.translate(mPosX, mPosY);
+    canvas.scale(mScaleFactor, mScaleFactor);
+
     // Récupération de la surface de travail
     final boolean isLandscape = getWidth() > getHeight();
     _gobanWidth = isLandscape ? getHeight() : getWidth();
@@ -201,13 +201,15 @@ public class BoardView extends View
 
     // Tracé des lignes
     Log.d(TAG, "Tracé des lignes");
-    
+
     boolean isFirstOrLast;
     for (int i = 0; i < _gobanSize.getSize(); i++)
     {
       isFirstOrLast = (i == 0 || i == _gobanSize.getSize() - 1);
-      canvas.drawLine((i * _globalCoef) + _globalPadding, _globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (isFirstOrLast ? _linePaintBig : _linePaint));
-      canvas.drawLine(_globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (i * _globalCoef) + _globalPadding, (isFirstOrLast ? _linePaintBig : _linePaint));
+      canvas.drawLine((i * _globalCoef) + _globalPadding, _globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding,
+          (isFirstOrLast ? _linePaintBig : _linePaint));
+      canvas.drawLine(_globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (i * _globalCoef) + _globalPadding,
+          (isFirstOrLast ? _linePaintBig : _linePaint));
     }
 
     // Tracé des hoshis
@@ -235,6 +237,8 @@ public class BoardView extends View
         }
       }
     }
+
+    canvas.restore();
     Log.d(TAG, "Fin du tracé");
   }
 
@@ -260,19 +264,147 @@ public class BoardView extends View
   }
 
   /**
-   * Écoute des clics écran. Délègue le traitement au gestureDetector
+   * Écoute des clics écran et gère les scrolls en cas de zoom.
+   * 
+   * Délègue le traitement :
+   * - au gestureDetector pour l'ajout des pierres
+   * - au scaleDectector pour le pinch to zoom
    */
   @Override
-  public boolean onTouchEvent(MotionEvent e)
+  public boolean onTouchEvent(MotionEvent event)
   {
     // performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-    _gestureDetector.onTouchEvent(e);
+    _gestureDetector.onTouchEvent(event);
+    _scaleDetector.onTouchEvent(event);
+
+    final int action = event.getAction();
+    int pointerIndex;
+    switch (action & MotionEvent.ACTION_MASK)
+    {
+      case MotionEvent.ACTION_DOWN:
+      {
+        final float x = event.getX();
+        final float y = event.getY();
+
+        mLastTouchX = x;
+        mLastTouchY = y;
+        mActivePointerId = event.getPointerId(0);
+        break;
+      }
+
+      case MotionEvent.ACTION_MOVE:
+        pointerIndex = event.findPointerIndex(mActivePointerId);
+        final float x = event.getX(pointerIndex);
+        final float y = event.getY(pointerIndex);
+
+        // Only move if the ScaleGestureDetector isn't processing a gesture.
+        if (!_scaleDetector.isInProgress())
+        {
+          final float dx = x - mLastTouchX;
+          final float dy = y - mLastTouchY;
+
+          mPosX += dx;
+          mPosY += dy;
+
+          if (mScaleFactor == 1.0f)
+          {
+            mPosX = 0.0f;
+            mPosY = 0.0f;
+          }
+          else
+          {
+            if (mPosX < 0.0f && Math.abs(mPosX) > getWidth() * (mScaleFactor - 1))
+            {
+              mPosX = -1 * getWidth() * (mScaleFactor - 1);
+            }
+            if (mPosX > 0.0f)
+            {
+              mPosX = 0.0f;
+            }
+            if (mPosY < 0.0f && Math.abs(mPosY) > getHeight() * (mScaleFactor - 1))
+            {
+              mPosY = -1 * getHeight() * (mScaleFactor - 1);
+            }
+            if (mPosY > 0.0f)
+            {
+              mPosY = 0.0f;
+            }
+          }
+          invalidate();
+        }
+
+        mLastTouchX = x;
+        mLastTouchY = y;
+
+        break;
+
+      case MotionEvent.ACTION_UP:
+        mActivePointerId = INVALID_POINTER_ID;
+        break;
+
+      case MotionEvent.ACTION_CANCEL:
+        mActivePointerId = INVALID_POINTER_ID;
+        break;
+
+      case MotionEvent.ACTION_POINTER_UP:
+        pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+        final int pointerId = event.getPointerId(pointerIndex);
+        if (pointerId == mActivePointerId)
+        {
+          // This was our active pointer going up. Choose a new
+          // active pointer and adjust accordingly.
+          final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+          mLastTouchX = event.getX(newPointerIndex);
+          mLastTouchY = event.getY(newPointerIndex);
+          mActivePointerId = event.getPointerId(newPointerIndex);
+        }
+        break;
+    }
+
+    invalidate();
     return true;
   }
 
-  @Override
-  public void onDraw(Canvas canvas)
+  private final class GobanGestureListener extends GestureDetector.SimpleOnGestureListener
   {
-    doDraw(canvas);
+    @Override
+    public boolean onSingleTapUp(MotionEvent e)
+    {
+      if (!_scaleDetector.isInProgress())
+      {
+        Point p = coord2Point(e.getX(), e.getY());
+        if (p.x < _gobanSize.getSize() && p.y < _gobanSize.getSize())
+        {
+          Log.d(TAG, "pressed - x: " + e.getX() + " - y: " + e.getY());
+          Log.d(TAG, "point   - x: " + p.x + " - y: " + p.y);
+          Log.d(TAG, "traced  - x: " + (int) (((p.x) * _globalCoef) + _globalPadding) + " - y: " + (int) (((p.y) * _globalCoef) + _globalPadding));
+          if (addStone(p))
+          {
+            invalidate();
+          }
+        }
+      }
+      return true;
+    }
+
+    private Point coord2Point(final float x, final float y)
+    {
+      return new Point((int) (((x - mPosX) / (_activeCellWidth)) / mScaleFactor), (int) (((y - mPosY) / (_activeCellWidth)) / mScaleFactor));
+    }
+  }
+
+  private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener
+  {
+    @Override
+    public boolean onScale(ScaleGestureDetector detector)
+    {
+      mScaleFactor *= detector.getScaleFactor();
+
+      // Don't let the object get too small or too large.
+      mScaleFactor = Math.max(1f, Math.min(mScaleFactor, 3.0f));
+
+      invalidate();
+      return true;
+    }
   }
 }
