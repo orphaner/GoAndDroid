@@ -10,7 +10,7 @@
         android:layout_height="wrap_content" >
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/boardWhiteImg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -36,7 +36,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/boardBlackImg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -44,27 +44,57 @@
             android:src="@drawable/blackstone" />
     </LinearLayout>
 
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="fill_vertical"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/boardCommentary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="T\ne\nx\nt\nV\ni\ne\nw\n t\ne\ns\nt\n d\ne\nd\ne\n k\ni\nk\no\n\no\n lol" />
+    </ScrollView>
+
     <org.beroot.android.BoardView
         android:id="@+id/boardView"
-        android:layout_width="490px"
-        android:layout_height="490px" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/button1"
-            android:layout_width="wrap_content"
+            android:id="@+id/boardBeginButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:layout_weight="1"
+            android:text="@string/boardBeginButton" />
 
         <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
+            android:id="@+id/boardPrevButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:layout_weight="1"
+            android:text="@string/boardPrevButton" />
+
+        <Button
+            android:id="@+id/boardNextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/boardNextButton" />
+
+        <Button
+            android:id="@+id/boardEndButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/boardEndButton" />
     </LinearLayout>
 
 </LinearLayout>

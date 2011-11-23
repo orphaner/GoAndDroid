@@ -14,9 +14,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RadialGradient;
 import android.graphics.Shader;
+import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -175,6 +181,65 @@ public class BoardView extends View
   }
 
   @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+  {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+    if (getWidth() > 0)
+    {
+      // Récupération de la surface de travail
+      final boolean isLandscape = getWidth() > getHeight();
+      _gobanWidth = isLandscape ? getMeasuredHeight() : getMeasuredWidth();
+
+      if (isLandscape)
+      {
+        setMeasuredDimension(getMeasuredHeight(), getMeasuredHeight());
+      }
+      else
+      {
+        setMeasuredDimension(getMeasuredWidth(), getMeasuredWidth());
+      }
+
+      // Calcul des mesures
+      Log.d(TAG, "Calcul des mesures");
+      _globalCoef = _gobanWidth / _gobanSize.getSize();
+      _activeCellWidth = _globalCoef;
+      _lineWidth = _globalCoef * (_gobanSize.getSize() - 1);
+      _backgroundWidth = _globalCoef * _gobanSize.getSize();
+      _globalPadding = _globalCoef / 2;
+
+      Bitmap.Config bitmapConfig = Bitmap.Config.ARGB_8888;
+      _blackStoneImage = Bitmap.createBitmap((int) _activeCellWidth, (int) _activeCellWidth, bitmapConfig);
+      final Canvas canvas2 = new Canvas(_blackStoneImage);
+      final float stoneCenter = getWidth() / 2;
+      float stoneRadius = stoneCenter - getWidth() / 30;
+      Path path = new Path();
+      path.addCircle(stoneCenter, stoneCenter, stoneRadius, Path.Direction.CW);
+      PathShape shape = new PathShape(path, getWidth(), getWidth());
+      shape.resize(_activeCellWidth, _activeCellWidth);
+      Paint _xferModePaintSrc = new Paint();
+      _xferModePaintSrc.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+      final Paint paint = new Paint(_xferModePaintSrc);
+      paint.setStyle(Paint.Style.FILL);
+      paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+      final float circleHighlight = stoneCenter - stoneCenter / 3, radiusHighlight = stoneCenter / 3;
+      final int blackStoneColor = _resources.getColor(R.color.blackStoneColor);
+      paint.setShader(new RadialGradient(circleHighlight, circleHighlight, radiusHighlight, _resources.getColor(R.color.blackStoneHighlightColor),
+          blackStoneColor, Shader.TileMode.CLAMP));
+      shape.draw(canvas2, paint);
+
+      _whiteStoneImage = Bitmap.createBitmap((int) _activeCellWidth, (int) _activeCellWidth, bitmapConfig);
+      canvas2.setBitmap(_whiteStoneImage);
+      final int whiteStoneColor = _resources.getColor(R.color.whiteStoneColor);
+      final float highlightEnd = stoneCenter + (float) Math.sqrt(stoneCenter * stoneCenter / 2);
+      paint.setShader(new LinearGradient(circleHighlight, circleHighlight, highlightEnd, highlightEnd, whiteStoneColor, _resources
+          .getColor(R.color.whiteStoneHighlightColor), Shader.TileMode.CLAMP));
+      shape.draw(canvas2, paint);
+      //Paint blackPaint = new Paint(paint);
+    }
+  }
+
+  @Override
   public void onDraw(Canvas canvas)
   {
     super.onDraw(canvas);
@@ -182,18 +247,6 @@ public class BoardView extends View
     canvas.save();
     canvas.translate(mPosX, mPosY);
     canvas.scale(mScaleFactor, mScaleFactor);
-
-    // Récupération de la surface de travail
-    final boolean isLandscape = getWidth() > getHeight();
-    _gobanWidth = isLandscape ? getHeight() : getWidth();
-
-    // Calcul des mesures
-    Log.d(TAG, "Calcul des mesures");
-    _globalCoef = _gobanWidth / _gobanSize.getSize();
-    _activeCellWidth = _globalCoef;
-    _lineWidth = _globalCoef * (_gobanSize.getSize() - 1);
-    _backgroundWidth = _globalCoef * _gobanSize.getSize();
-    _globalPadding = _globalCoef / 2;
 
     // Image de fond
     Log.d(TAG, "image de fond");

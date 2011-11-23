@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 /**
  * @author nicolas
- *
+ * 
  */
 public class Board extends Activity
 {
@@ -25,9 +25,9 @@ public class Board extends Activity
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.board);
-    
-    _boardView = (BoardView)findViewById(R.id.boardView);
-    
+
+    _boardView = (BoardView) findViewById(R.id.boardView);
+
     setBoardSize();
     setName(NewGame.BLACK_PLAYER_NAME, R.id.boardBlackPlayerText);
     setName(NewGame.WHITE_PLAYER_NAME, R.id.boardWhitePlayerText);
@@ -60,7 +60,10 @@ public class Board extends Activity
   private void setName(String key, int textViewId)
   {
     String name = getIntent().getStringExtra(key);
-    TextView textView = (TextView)findViewById(textViewId);
-    textView.setText(name);
+    TextView textView = (TextView) findViewById(textViewId);
+    if (textView != null)
+    {
+      textView.setText(name);
+    }
   }
 }

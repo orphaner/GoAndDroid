@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Go And Droid</string>
     <string name="homeNewGame">New Game</string>
     <string name="homeMyGames">My Games</string>
@@ -11,6 +12,16 @@
     <string name="newGameRightArrow">></string>
     <string name="newGameKomi">Komi</string>
     <string name="newGameBlackName">Black Name</string>
-    <string name="newGameWhiteName">White Name</string>
+    <string name="newGameWhiteName">White Namer</string>
     <string name="newGameHandicap">Handicap</string>
+    <string name="boardPrevButton">&lt;</string>
+    <string name="boardNextButton">></string>
+    <string name="boardEndButton">>|</string>
+    <string name="boardBeginButton">|&lt;</string>
+
+    <color name="blackStoneColor">@android:color/black</color>
+    <color name="blackStoneHighlightColor">#BCBCBC</color>
+    <color name="whiteStoneColor">@android:color/white</color>
+    <color name="whiteStoneHighlightColor">#BCBCBC</color>
+
 </resources>
