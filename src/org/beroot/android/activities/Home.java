@@ -29,5 +29,20 @@ public class Home extends Activity
     
     Button newGameButton = (Button) findViewById(R.id.newGameButton);
     newGameButton.setOnClickListener(newGameListener);
+    
+
+    
+    OnClickListener myGamesListener = new OnClickListener()
+    {
+      @Override
+      public void onClick(View v)
+      {
+        Intent intent = new Intent(getBaseContext(), MyGames.class);
+        startActivity(intent);
+      }
+    };
+    
+    Button myGamesButton = (Button) findViewById(R.id.myGamesButton);
+    myGamesButton.setOnClickListener(myGamesListener);
   }
 }

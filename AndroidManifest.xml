@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.beroot.android"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.10" >
 
     <uses-sdk android:minSdkVersion="10" />
 
@@ -28,6 +28,14 @@
         </activity>
         <activity
             android:name=".activities.Board"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".activities.MyGames"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".activities.LoadGame"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
     </application>

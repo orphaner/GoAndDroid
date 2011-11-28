@@ -112,6 +112,11 @@ public class BoardView extends View
     postInvalidate();
   }
 
+  public void setGo(Go go)
+  {
+    _go = go;
+  }
+
   /**
    * 
    */
@@ -269,7 +274,7 @@ public class BoardView extends View
     Log.d(TAG, "Tracé des hoshis");
     for (Point hoshi : GoConstants.getHoshis(_gobanSize))
     {
-      canvas.drawCircle(((hoshi.x - 1) * _globalCoef) + _globalPadding, ((hoshi.y - 1) * _globalCoef) + _globalPadding, 5, _linePaint);
+      canvas.drawCircle(((hoshi.x - 1) * _globalCoef) + _globalPadding, ((hoshi.y - 1) * _globalCoef) + _globalPadding, 5 / (_globalCoef + 1), _linePaint);
     }
 
     // Tracé des pierres
@@ -310,7 +315,7 @@ public class BoardView extends View
     float y;
     x = (px * _globalCoef) + _globalPadding - reduc;
     y = (py * _globalCoef) + _globalPadding - reduc;
-    Log.d(TAG, "drawStone - B(" + px + "," + py + ") - coord(" + x + "," + y + ")");
+    //Log.d(TAG, "drawStone - B(" + px + "," + py + ") - coord(" + x + "," + y + ")");
     Matrix matrix = new Matrix();
     matrix.postTranslate(x, y);
     canvas.drawBitmap(stone, matrix, null);
