@@ -5,7 +5,7 @@ package org.beroot.android.goengine;
  * 
  *         Représentation d'une chaine
  */
-public class StringData
+public class StringData implements Cloneable
 {
   // ------------------------------------------------------------------------
   // Données de jeu
@@ -83,9 +83,8 @@ public class StringData
   // Logique
   // ------------------------------------------------------------------------
   /**
-	 * 
-	 *
-	 */
+   * 
+   */
   public void resetLiberties()
   {
     libertyCount = 0;
@@ -143,5 +142,23 @@ public class StringData
       }
     }
     neighborCount--;
+  }
+
+  public StringData clone()
+  {
+    StringData sd = null;
+    try
+    {
+      sd = (StringData) super.clone();
+      sd.stones = (int[]) stones.clone();
+      sd.liberties = (int[]) liberties.clone();
+      sd.neighbors = (int[]) neighbors.clone();
+    }
+    catch (CloneNotSupportedException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return sd;
   }
 }

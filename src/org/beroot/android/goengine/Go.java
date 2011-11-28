@@ -4,7 +4,7 @@ package org.beroot.android.goengine;
  * @author Nicolas
  * 
  */
-public class Go
+public class Go implements Cloneable
 {
 
   // ------------------------------------------------------------------------
@@ -930,5 +930,31 @@ public class Go
   public void addStone(String move, byte color)
   {
     addStone(pos(I(move), J(move)), color);
+  }
+
+  public Go clone()
+  {
+    Go go = null;
+    try
+    {
+      go = (Go) super.clone();
+      go._board = (byte[]) _board.clone();
+      go._stringNumber = (int[]) _stringNumber.clone();
+      go._strings = (StringData[]) _strings.clone();
+      go._markLiberties = (int[]) _markLiberties.clone();
+      for (int i = 0; i < _nextString; i++)
+      {
+        if (go._strings[i] != null)
+        {
+          go._strings[i] = (StringData) _strings[i].clone();
+        }
+      }
+    }
+    catch (CloneNotSupportedException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return go;
   }
 }
