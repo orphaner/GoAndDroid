@@ -13,7 +13,7 @@ public class StringData
   /**
    * Color of string, BLACK or WHITE
    */
-  public int color;
+  public byte color;
 
   /**
    * Number of stones in string.
@@ -65,7 +65,7 @@ public class StringData
    * @param pos position initiale de la chaine
    * @param color couleur de la chaine
    */
-  public StringData(int boardSize, int pos, int color)
+  public StringData(int boardSize, int pos, byte color)
   {
     // Initialisation des structures
     stones = new int[boardSize];

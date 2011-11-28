@@ -53,7 +53,7 @@ public class Go
   /**
    * Représentation interne du goban
    */
-  public int[] _board;
+  public byte[] _board;
 
   /**
    * Tableau qui pour une position donnée sur le goban référence la chaine associée
@@ -95,7 +95,25 @@ public class Go
    */
   private int _capturedBlack;
 
+  /**
+   * Dernière position d'un KO
+   */
   private int _lastKoPos;
+
+  /**
+   * Couleur du joueur qui doit jouer
+   */
+  private byte _playerTurn;
+
+  /**
+   * Couleur du premier joueur qui doit jouer
+   */
+  private byte _firstColorPlay = BLACK;
+
+  /**
+   * TODO : bidouillage pour prendre en compte les specs SGF !
+   */
+  private boolean isCalculed = false;
 
   // ------------------------------------------------------------------------
   // Méthodes utilitaires
@@ -172,6 +190,24 @@ public class Go
   }
 
   /**
+   * @param move
+   * @return
+   */
+  private int J(String move)
+  {
+    return (int) (move.charAt(1) - 'a');
+  }
+
+  /**
+   * @param move
+   * @return
+   */
+  private int I(String move)
+  {
+    return (int) (move.charAt(0) - 'a');
+  }
+
+  /**
    * 
    * @param pos
    * @return
@@ -207,9 +243,9 @@ public class Go
    * @param color
    * @return
    */
-  private int otherColor(int color)
+  private byte otherColor(byte color)
   {
-    return (BLACK + WHITE) - color;
+    return (byte) ((BLACK + WHITE) - color);
   }
 
   /**
@@ -237,7 +273,7 @@ public class Go
    * @param color
    * @return
    */
-  private boolean unmarkedColorString(int pos, int color)
+  private boolean unmarkedColorString(int pos, byte color)
   {
     return _board[pos] == color && _strings[_stringNumber[pos]].mark != _markString;
   }
@@ -352,6 +388,25 @@ public class Go
     System.out.println("");
   }
 
+  /**
+   * Retourne la couleur du joueur qui doit jouer
+   * @return
+   */
+  public byte getPlayerTurn()
+  {
+    return _playerTurn;
+  }
+
+  /**
+   * Affecte la couleur du premier joueur qui doit jouer
+   * @return
+   */
+  public void setFirstPlayer(byte color)
+  {
+    _firstColorPlay = color;
+    _playerTurn = color;
+  }
+
   // ------------------------------------------------------------------------
   // Constructeur
   // ------------------------------------------------------------------------
@@ -371,18 +426,8 @@ public class Go
     boardMin = maxBoard + 2;
     boardMax = (maxBoard + 1) * (maxBoard + 1);
 
-    // Initialisation des structures
-    _board = new int[boardSize];
     initInternals();
-
-    // Ajout des bornes sur le goban
-    for (int k = 0; k < boardSize; k++)
-    {
-      if (!onBoard2(I(k), J(k)))
-      {
-        _board[k] = GRAY;
-      }
-    }
+    initBoard();
   }
 
   /**
@@ -406,9 +451,38 @@ public class Go
     }
   }
 
+  private void initBoard()
+  {
+    _playerTurn = _firstColorPlay;
+
+    // Initialisation des structures
+    _board = new byte[boardSize];
+
+    // Ajout des bornes sur le goban
+    for (int k = 0; k < boardSize; k++)
+    {
+      if (!onBoard2(I(k), J(k)))
+      {
+        _board[k] = GRAY;
+      }
+    }
+  }
+
   // ------------------------------------------------------------------------
   // Logique de jeu en coup par coup
   // ------------------------------------------------------------------------
+  /**
+   * Joue un coup depuis une position SGF
+   * 
+   * @param move position SGF
+   * @param color Couleur de la pierre
+   * @return true / false pour indiquer si le coup a été joué ou non
+   */
+  public boolean play(String move, byte color)
+  {
+    return play(I(move), J(move), color);
+  }
+
   /**
    * Joue un coup
    * 
@@ -422,7 +496,7 @@ public class Go
     int pos = pos(x, y);
 
     // 1 - Vérification si le coup est jouable
-    if (!isLegal(pos, color))
+    if (isCalculed && !isLegal(pos, color))
     {
       return false;
     }
@@ -431,10 +505,18 @@ public class Go
     int s = 0;
     int capturedStones = 0;
 
+    _playerTurn = otherColor(color);
     _lastKoPos = 0;
     _board[pos] = color;
     _stringNumber[pos] = -1;
     _markString++;
+
+    if (!isCalculed)
+    {
+      newPosition();
+      isCalculed = true;
+      _markString++;
+    }
 
     // 2 - Parcours des 4 directions cardinales
     int direction;
@@ -500,7 +582,7 @@ public class Go
    */
   private void createNewString(int pos)
   {
-    int color = _board[pos];
+    byte color = _board[pos];
     int s = _nextString++;
 
     _stringNumber[pos] = s;
@@ -545,7 +627,7 @@ public class Go
 
     // Mise à jour des chaines adverses
     _markString++;
-    int color = _board[pos];
+    byte color = _board[pos];
     int direction;
     for (int k = 0; k < 4; k++)
     {
@@ -567,7 +649,7 @@ public class Go
    */
   private void assimilateNeighborStrings(int pos)
   {
-    int color = _board[pos];
+    byte color = _board[pos];
     int s = _nextString++;
 
     _stringNumber[pos] = s;
@@ -717,7 +799,7 @@ public class Go
    * @param pos
    * @return
    */
-  public boolean isLegal(int pos, int color)
+  public boolean isLegal(int pos, byte color)
   {
     if (pos == PASS_MOVE)
     {
@@ -771,6 +853,15 @@ public class Go
     {
       findLibertiesAndNeighbors(s);
     }
+
+    // Recherche et suppression des chaines qui n'ont plus de libertées
+    //    for (int s = 0; s < _nextString; s++)
+    //    {
+    //      if (_strings[s].libertyCount == 0)
+    //      {
+    //        removeString(s);
+    //      }
+    //    }
   }
 
   /**
@@ -830,8 +921,14 @@ public class Go
     }
   }
 
-  public void addStone(int pos, int color)
+  public void addStone(int pos, byte color)
   {
+    _playerTurn = otherColor(color);
     _board[pos] = color;
+  }
+
+  public void addStone(String move, byte color)
+  {
+    addStone(pos(I(move), J(move)), color);
   }
 }
