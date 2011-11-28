@@ -68,24 +68,24 @@ public class Sgf
     newNode = fillProperties(newNode);
     if (parent == null)
     {
-      _game._first = newNode;
+      _game.setFirstNode(newNode);
     }
     else
     {
       if (variation)
       {
-        if (parent._next == null)
+        if (parent.getNextNode() == null)
         {
-          parent._next = newNode;
+          parent.setNextNode(newNode);
         }
         else
         {
-          parent._variations.add(newNode);
+          parent.addVariation(newNode);
         }
       }
       else
       {
-        parent._next = newNode;
+        parent.setNextNode(newNode);
       }
     }
     return newNode;
@@ -107,19 +107,27 @@ public class Sgf
         case ')':
         case ';':
           _cursor--;
-          System.out.println("end filling prop");
           return node;
 
         case ']':
-          System.out.println("endvalue: " + value);
-          node._props.put(prop, value);
-          prop = "";
-          value = "";
-          startValue = false;
+          _cursor++;
+          c = _content.charAt(_cursor);
+          if (c != '[')
+          {
+            node.addProp(prop, value);
+            prop = "";
+            value = "";
+            startValue = false;
+            _cursor--;
+          }
+          else
+          {
+            value += "|";
+            System.out.println("multi value ");
+          }
           break;
 
         case '[':
-          System.out.println("prop: " + prop);
           startValue = true;
           break;
 
@@ -152,7 +160,7 @@ public class Sgf
     {
       _cursor++;
     }
-    System.out.println("( trouvé à position: " + _cursor);
+    //System.out.println("( trouvé à position: " + _cursor);
   }
 
   private boolean eof()
