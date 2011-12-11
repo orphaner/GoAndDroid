@@ -1,18 +1,11 @@
 package org.beroot.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.beroot.android.goengine.Go;
-import org.beroot.android.goengine.GoConstants;
 import org.beroot.android.goengine.GobanSize;
 import org.beroot.android.util.Point;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
@@ -28,31 +21,13 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 
-public class BoardView extends View
+public class BoardView extends BoardViewCommon
 {
-  private static final String TAG = "beroot";
 
-  // --------------------------------------------------------------------------
-  // Objets utilisés dans la phase de doPaint()
-  // --------------------------------------------------------------------------
-  private final Paint _gobanBackgroundImage = new Paint();
-  private Bitmap _whiteStoneImage;
-  private Bitmap _blackStoneImage;
-  private int _gobanWidth;
-  private float _activeCellWidth;
-  private Paint _linePaint;
-  private Paint _linePaintBig;
-  private int _globalCoef;
-  private int _lineWidth;
-  private int _backgroundWidth;
-  private int _globalPadding;
-
-  // --------------------------------------------------------------------------
-  // Objets généraux
-  // --------------------------------------------------------------------------
-  private Resources _resources;
+  protected Bitmap _whiteStoneImage;
+  protected Bitmap _blackStoneImage;
+  
   private GestureDetector _gestureDetector;
   private ScaleGestureDetector _scaleDetector;
 
@@ -67,13 +42,6 @@ public class BoardView extends View
   private int mActivePointerId = INVALID_POINTER_ID;
   private float mScaleFactor = 1.0f;
 
-  // --------------------------------------------------------------------------
-  // Objets de jeu
-  // --------------------------------------------------------------------------
-  private GobanSize _gobanSize;
-  private Go _go;
-  private int _moveCount = 0;
-  private List<Point> _plays = new ArrayList<Point>();
 
   // --------------------------------------------------------------------------
   // Initialisation
@@ -96,85 +64,30 @@ public class BoardView extends View
     init(context);
   }
 
-  private void init(Context context)
+  protected void init(Context context)
   {
-    _resources = getResources();
+    super.init(context);
     _gestureDetector = new GestureDetector(context, new GobanGestureListener());
     _scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
     setGobanSize(GobanSize.G19);
   }
 
-  public void setGobanSize(GobanSize gobanSize)
-  {
-    _gobanSize = gobanSize;
-    _go = new Go(_gobanSize.getSize());
-    initDrawObjects();
-    postInvalidate();
-  }
-
-  public void setGo(Go go)
-  {
-    _go = go;
-  }
-
-  /**
-   * 
-   */
-  private void initDrawObjects()
-  {
-    // Image de fond du goban
-    _gobanBackgroundImage
-        .setShader(new BitmapShader(BitmapFactory.decodeResource(_resources, R.drawable.board), Shader.TileMode.MIRROR, Shader.TileMode.MIRROR));
-
-    BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inJustDecodeBounds = false;
-    options.inDither = false;
-    options.inScaled = false;
-    options.inSampleSize = 1;
-    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-
-    float desiredScale = 16.5f / _gobanSize.getSize();
-    Matrix matrix = new Matrix();
-    matrix.postScale(desiredScale, desiredScale);
-
-    // Image des pierres blanches
-    _whiteStoneImage = BitmapFactory.decodeResource(getResources(), R.drawable.whitestone, options);
-    _whiteStoneImage = Bitmap.createBitmap(_whiteStoneImage, 0, 0, _whiteStoneImage.getWidth(), _whiteStoneImage.getHeight(), matrix, true);
-
-    // Image des pierres noires
-    _blackStoneImage = BitmapFactory.decodeResource(getResources(), R.drawable.blackstone, options);
-    _blackStoneImage = Bitmap.createBitmap(_blackStoneImage, 0, 0, _blackStoneImage.getWidth(), _blackStoneImage.getHeight(), matrix, true);
-
-    // Couleur des lignes et hoshis du goban
-    _linePaint = new Paint();
-    _linePaint.setAntiAlias(true);
-    _linePaint.setARGB(255, 0, 0, 0);
-    _linePaint.setStrokeWidth(0.8f);
-
-    _linePaintBig = new Paint();
-    _linePaintBig.setAntiAlias(true);
-    _linePaintBig.setARGB(255, 0, 0, 0);
-    _linePaintBig.setStrokeWidth(2f);
-  }
 
   // --------------------------------------------------------------------------
   // Phase de jeu
   // --------------------------------------------------------------------------
-
   private boolean addStone(Point p)
   {
     if (isBlackTurn() && _go.isLegal(_go.pos(p.x, p.y), Go.BLACK))
     {
       _go.play(p.x, p.y, Go.BLACK);
       _moveCount++;
-      _plays.add(p);
       return true;
     }
     else if (!isBlackTurn() && _go.isLegal(_go.pos(p.x, p.y), Go.WHITE))
     {
       _go.play(p.x, p.y, Go.WHITE);
       _moveCount++;
-      _plays.add(p);
       return true;
     }
     return false;
@@ -247,38 +160,19 @@ public class BoardView extends View
   @Override
   public void onDraw(Canvas canvas)
   {
-    super.onDraw(canvas);
-
     canvas.save();
     canvas.translate(mPosX, mPosY);
     canvas.scale(mScaleFactor, mScaleFactor);
 
-    // Image de fond
-    Log.d(TAG, "image de fond");
-    canvas.drawRect(0, 0, _backgroundWidth, _backgroundWidth, _gobanBackgroundImage);
+    super.onDraw(canvas);
 
-    // Tracé des lignes
-    Log.d(TAG, "Tracé des lignes");
+    canvas.restore();
+  }
 
-    boolean isFirstOrLast;
-    for (int i = 0; i < _gobanSize.getSize(); i++)
-    {
-      isFirstOrLast = (i == 0 || i == _gobanSize.getSize() - 1);
-      canvas.drawLine((i * _globalCoef) + _globalPadding, _globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding,
-          (isFirstOrLast ? _linePaintBig : _linePaint));
-      canvas.drawLine(_globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (i * _globalCoef) + _globalPadding,
-          (isFirstOrLast ? _linePaintBig : _linePaint));
-    }
-
-    // Tracé des hoshis
-    Log.d(TAG, "Tracé des hoshis");
-    for (Point hoshi : GoConstants.getHoshis(_gobanSize))
-    {
-      canvas.drawCircle(((hoshi.x - 1) * _globalCoef) + _globalPadding, ((hoshi.y - 1) * _globalCoef) + _globalPadding, 5 / (_globalCoef + 1), _linePaint);
-    }
-
+  @Override
+  protected void drawStones(Canvas canvas)
+  {
     // Tracé des pierres
-    Log.d(TAG, "Tracé des pierres");
     float reduc = _globalCoef / 1.8f;
 
     for (int i = _go.boardMin; i < _go.boardMax; i++)
@@ -287,38 +181,26 @@ public class BoardView extends View
       {
         if (_go._board[i] == Go.WHITE)
         {
-          drawStone(canvas, reduc, _go.I(i), _go.J(i), _whiteStoneImage);
+          drawStone(canvas, reduc, _go.I(i), _go.J(i), Go.WHITE);
         }
         else if (_go._board[i] == Go.BLACK)
         {
-          drawStone(canvas, reduc, _go.I(i), _go.J(i), _blackStoneImage);
+          drawStone(canvas, reduc, _go.I(i), _go.J(i), Go.BLACK);
         }
       }
     }
-
-    canvas.restore();
-    Log.d(TAG, "Fin du tracé");
   }
 
-  /**
-   * Trace une pierre sur le goban
-   * 
-   * @param canvas
-   * @param reduc
-   * @param px
-   * @param py
-   * @param stone
-   */
-  private void drawStone(Canvas canvas, float reduc, int px, int py, Bitmap stone)
+  @Override
+  protected void drawStone(Canvas canvas, float reduc, int px, int py, byte color)
   {
     float x;
     float y;
     x = (px * _globalCoef) + _globalPadding - reduc;
     y = (py * _globalCoef) + _globalPadding - reduc;
-    //Log.d(TAG, "drawStone - B(" + px + "," + py + ") - coord(" + x + "," + y + ")");
     Matrix matrix = new Matrix();
     matrix.postTranslate(x, y);
-    canvas.drawBitmap(stone, matrix, null);
+    canvas.drawBitmap(color == Go.BLACK ? _blackStoneImage : _whiteStoneImage, matrix, null);
   }
 
   /**
