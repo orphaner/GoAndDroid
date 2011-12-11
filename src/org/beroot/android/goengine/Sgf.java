@@ -4,12 +4,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.beroot.android.util.Perf;
+
+import android.util.Log;
+
 public class Sgf
 {
   private String _fileName;
   private GoGame _game;
   private String _content;
   private int _cursor = 0;
+  private boolean _keepFileInMemory = false;
 
   public Sgf(String fileName)
   {
@@ -18,6 +23,7 @@ public class Sgf
 
   public GoGame load()
   {
+    Perf perf = new Perf();
     try
     {
       readFile();
@@ -35,6 +41,12 @@ public class Sgf
       buildTree(null);
     }
 
+    if (!_keepFileInMemory)
+    {
+      _content = null;
+    }
+
+    Log.d("beroot", "Load SGF: " + perf.getTime() + "s");
     return _game;
   }
 
@@ -123,7 +135,6 @@ public class Sgf
           else
           {
             value += "|";
-            System.out.println("multi value ");
           }
           break;
 
@@ -194,7 +205,18 @@ public class Sgf
   public static void main(String args[])
   {
     //Sgf sgf = new Sgf("/home/nicolas/android/go/Lee-Changho-vs-Xie-He-20111123.sgf");
-    Sgf sgf = new Sgf("/home/nicolas/android/go/test1.sgf");
+    Sgf sgf = new Sgf("/home/nicolas/Documents/go/Kogo's Joseki Dictionary.sgf");
     sgf.load();
+  }
+
+  public GoGame load(boolean keepFileInMemory)
+  {
+    _keepFileInMemory = keepFileInMemory;
+    return load();
+  }
+
+  public String getFileContent()
+  {
+    return _content;
   }
 }
