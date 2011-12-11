@@ -1,14 +1,14 @@
 package org.beroot.android.activities;
 
-import java.util.List;
-
-import org.beroot.android.BoardView;
+import org.beroot.android.BoardViewPreview;
 import org.beroot.android.R;
-import org.beroot.android.goengine.GoGame;
+import org.beroot.android.db.DaoGame;
+import org.beroot.android.db.DbGame;
 import org.beroot.android.goengine.GobanSize;
-import org.beroot.android.goengine.Sgf;
+import org.beroot.android.util.Perf;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,25 +17,25 @@ import android.widget.TextView;
 
 public class MyGamesAdapter extends BaseAdapter
 {
-  private List<String> _sgfs;
+  private DaoGame _daoGame;
   private LayoutInflater _inflater;
 
-  public MyGamesAdapter(Context ctx, List<String> sgfs)
+  public MyGamesAdapter(Context ctx, DaoGame daoGame)
   {
     _inflater = LayoutInflater.from(ctx);
-    _sgfs = sgfs;
+    _daoGame = daoGame;
   }
 
   @Override
   public int getCount()
   {
-    return _sgfs.size();
+    return _daoGame.getCount();
   }
 
   @Override
   public Object getItem(int i)
   {
-    return _sgfs.get(i);
+    return _daoGame.getGameFromId(i + 1);
   }
 
   @Override
@@ -53,26 +53,21 @@ public class MyGamesAdapter extends BaseAdapter
       view = _inflater.inflate(R.layout.itemsgf, null);
       vh._whitePlayer = (TextView) view.findViewById(R.id.fileWhitePlayerText);
       vh._blackPlayer = (TextView) view.findViewById(R.id.fileBlackPlayerText);
-      vh._boardView = (BoardView) view.findViewById(R.id.itemBoardView);
-      vh._boardView.setGobanSize(GobanSize.G19);
-      
-      //Sgf sgf = new Sgf("/sdcard/GoAndDroid/" + _sgfs.get(position));
-      //GoGame _gg = sgf.load();
-      //vh._whitePlayer.setText(_gg.getWhitePlayerName());
-      //vh._blackPlayer.setText(_gg.getBlackPlayerName());
-      //while (_gg.hasNextNode())
-      //{
-      //  _gg.nextNode();
-      //}
-      //vh._boardView.setGo(_gg.getGoEngine());
-      
+      vh._boardView = (BoardViewPreview) view.findViewById(R.id.itemBoardView);
+      vh._boardView.setGobanSize(GobanSize.G19); // TODO à mettre en bdd
       view.setTag(vh);
     }
     else
     {
       vh = (ViewHolder) view.getTag();
     }
-    //vh._sgfFileName.setText(_sgfs.get(position));
+
+    Perf perf = new Perf();
+    DbGame game = (DbGame) getItem(position);
+    vh._whitePlayer.setText(game.getWhitePlayerName());
+    vh._blackPlayer.setText(game.getBlackPlayerName());
+    vh._boardView.setStones(game.getStones());
+    Log.d("beroot", "Load DbGame: " + perf.getTime() + " s");
     return view;
   }
 
@@ -80,6 +75,6 @@ public class MyGamesAdapter extends BaseAdapter
   {
     TextView _whitePlayer;
     TextView _blackPlayer;
-    BoardView _boardView;
+    BoardViewPreview _boardView;
   }
 }

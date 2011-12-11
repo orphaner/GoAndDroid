@@ -4,10 +4,10 @@
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:orientation="horizontal" >
 
-    <org.beroot.android.BoardView
+    <org.beroot.android.BoardViewPreview
         android:id="@+id/itemBoardView"
-        android:layout_width="wrap_content"
-        android:layout_height="?android:attr/listPreferredItemHeight" />
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
     <LinearLayout
         android:id="@+id/testtdeljhlkjhdsf"
@@ -63,13 +63,12 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
     </LinearLayout>
-
+    
     <!--
-        TextView
+    <TextView
         android:id="@+id/sgfFileName"
         android:layout_width="wrap_content"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     -->
-
 </LinearLayout>

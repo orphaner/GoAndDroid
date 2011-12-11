@@ -1,10 +1,8 @@
 package org.beroot.android.activities;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.beroot.android.R;
+import org.beroot.android.db.DaoGame;
+import org.beroot.android.db.DbGame;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,16 +16,17 @@ public class MyGames extends Activity
 {
   private ListView lvListe;
 
-  private List<String> sgfs = new ArrayList<String>();
+  private DaoGame _daoGame;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.mygames);
-    fillList();
+    _daoGame = new DaoGame(getBaseContext());
+    _daoGame.open();
 
-    MyGamesAdapter adapter = new MyGamesAdapter(this, sgfs);
+    MyGamesAdapter adapter = new MyGamesAdapter(this, _daoGame);
     lvListe = (ListView) findViewById(R.id.lvListe);
     lvListe.setAdapter(adapter);
 
@@ -37,20 +36,17 @@ public class MyGames extends Activity
       public void onItemClick(AdapterView<?> a, View v, int position, long id)
       {
         Intent loadGameIntent = new Intent(getBaseContext(), LoadGame.class);
-        String sgfFile = (String) lvListe.getItemAtPosition(position);
-        loadGameIntent.putExtra("SGF", sgfFile);
+        DbGame game = (DbGame) lvListe.getItemAtPosition(position);
+        loadGameIntent.putExtra("SGF", game.getFileName());
         startActivity(loadGameIntent);
       }
     });
   }
 
-  private void fillList()
+  @Override
+  protected void onDestroy()
   {
-    File dir = new File("/sdcard/GoAndDroid/");
-    String[] files = dir.list();
-    for (String f : files)
-    {
-      sgfs.add(f);
-    }
+    super.onDestroy();
+    _daoGame.close();
   }
 }
