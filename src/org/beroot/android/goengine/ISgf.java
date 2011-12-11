@@ -1,5 +1,9 @@
 package org.beroot.android.goengine;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public interface ISgf
 {
   /**
@@ -56,7 +60,7 @@ public interface ISgf
    * Property type: move
    * Property value: move
    */
-  public static final String B = "B ";
+  public static final String B = "B";
 
   /**
    * Black time left
@@ -91,7 +95,7 @@ public interface ISgf
    * Property type: -
    * Property value: text
    */
-  public static final String C = "C ";
+  public static final String C = "C";
 
   /**
    * Charset
@@ -280,7 +284,7 @@ public interface ISgf
    * Property type: -
    * Property value: simpletext
    */
-  public static final String N = "N ";
+  public static final String N = "N";
 
   /**
    * OtStones Black
@@ -469,7 +473,7 @@ public interface ISgf
    * Property type: -
    * Property value: real
    */
-  public static final String V = "V ";
+  public static final String V = "V";
 
   /**
    * View
@@ -483,7 +487,7 @@ public interface ISgf
    * Property type: move
    * Property value: move
    */
-  public static final String W = "W ";
+  public static final String W = "W";
 
   /**
    * White time left
@@ -505,4 +509,9 @@ public interface ISgf
    * Property value: simpletext
    */
   public static final String WT = "WT";
+
+  /**
+   * Liste des propriétés représentant des coups ou des ajouts/suppression de pierres
+   */
+  public static final Set<String> MOVES_PROP = new HashSet<String>(Arrays.asList(new String[] { W, B, AB, AW, AE }));
 }
