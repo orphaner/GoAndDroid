@@ -6,10 +6,7 @@ import org.beroot.android.goengine.GoGame;
 import org.beroot.android.util.StringUtils;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -52,6 +49,9 @@ public abstract class CommonGame extends Activity
    */
   protected Button _beginButton;
   
+  /**
+   * 
+   */
   protected Context _context;
 
   /**
@@ -87,12 +87,10 @@ public abstract class CommonGame extends Activity
     if (StringUtils.isEmpty(comment))
     {
       _boardCommentary.setText("");
-      _boardCommentary.invalidate(); // TODO utile ?
     }
     else
     {
       _boardCommentary.setText(comment);
-      _boardCommentary.invalidate(); // TODO utile ?
     }
   }
 
@@ -133,14 +131,6 @@ public abstract class CommonGame extends Activity
       while (_gg.hasNextNode())
       {
         _gg.nextNode();
-        ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(ACTIVITY_SERVICE);
-        MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(memoryInfo);
-
-        Log.i("beroot", " memoryInfo.availMem " + memoryInfo.availMem + "\n" );
-        Log.i("beroot", " memoryInfo.lowMemory " + memoryInfo.lowMemory + "\n" );
-        Log.i("beroot", " memoryInfo.threshold " + memoryInfo.threshold + "\n" );
-
       }
       updateComment();
       _boardView.setGo(_gg.getGoEngine());
@@ -168,6 +158,10 @@ public abstract class CommonGame extends Activity
     @Override
     public void onClick(View v)
     {
+      _gg.goToFirstNode();
+      _boardView.setGo(_gg.getGoEngine());
+      updateComment();
+      _boardView.invalidate();
     }
   }
 }
