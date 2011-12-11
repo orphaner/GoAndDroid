@@ -23,5 +23,6 @@
     <color name="blackStoneHighlightColor">#BCBCBC</color>
     <color name="whiteStoneColor">@android:color/white</color>
     <color name="whiteStoneHighlightColor">#BCBCBC</color>
+    <string name="sync">Sync</string>
 
 </resources>
