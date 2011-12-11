@@ -21,5 +21,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/homeProblems" />
+    
+    <Button
+        android:id="@+id/syncButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sync" />
 
 </LinearLayout>

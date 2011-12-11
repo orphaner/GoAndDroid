@@ -16,7 +16,7 @@ public class Home extends Activity
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.home);
-    
+
     OnClickListener newGameListener = new OnClickListener()
     {
       @Override
@@ -26,12 +26,10 @@ public class Home extends Activity
         startActivity(intent);
       }
     };
-    
+
     Button newGameButton = (Button) findViewById(R.id.newGameButton);
     newGameButton.setOnClickListener(newGameListener);
-    
 
-    
     OnClickListener myGamesListener = new OnClickListener()
     {
       @Override
@@ -41,8 +39,21 @@ public class Home extends Activity
         startActivity(intent);
       }
     };
-    
+
     Button myGamesButton = (Button) findViewById(R.id.myGamesButton);
     myGamesButton.setOnClickListener(myGamesListener);
+
+    OnClickListener syncListener = new OnClickListener()
+    {
+      @Override
+      public void onClick(View v)
+      {
+        Sync sync = new Sync();
+        sync.process(getBaseContext());
+      }
+    };
+
+    Button syncButton = (Button) findViewById(R.id.syncButton);
+    syncButton.setOnClickListener(syncListener);
   }
 }
