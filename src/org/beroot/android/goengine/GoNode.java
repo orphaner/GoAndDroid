@@ -1,7 +1,7 @@
 package org.beroot.android.goengine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +18,7 @@ public class GoNode
   /**
    * Référence vers le noeud parent
    */
-  private GoNode _prev;
+  private GoNode _prev = null;
 
   /**
    * Liste de variations du noeud courant
@@ -66,7 +66,8 @@ public class GoNode
   {
     if (_variations == null)
     {
-      _variations = new ArrayList<GoNode>();
+      //_variations = new ArrayList<GoNode>();
+      _variations = new LinkedList<GoNode>();
     }
     _variations.add(variation);
   }
@@ -94,12 +95,24 @@ public class GoNode
   // ------------------------------------------------------------------------
   public void addProp(String key, String value)
   {
-    // TODO remplir _movesAndStones
-    if (_props == null)
+    // Ajout d'un coup
+    if (ISgf.MOVES_PROP.contains(key))
     {
-      _props = new HashMap<String, String>();
+      if (_movesAndStones == null)
+      {
+        _movesAndStones = new LinkedList<SgfProperty>();
+      }
+      _movesAndStones.add(new SgfProperty(key, value));
     }
-    _props.put(key, value);
+    // Ajout d'une propriété
+    else
+    {
+      if (_props == null)
+      {
+        _props = new HashMap<String, String>();
+      }
+      _props.put(key, value);
+    }
   }
 
   public String getProp(String key)
@@ -109,5 +122,10 @@ public class GoNode
       return _props.get(key);
     }
     return null;
+  }
+
+  public List<SgfProperty> getMovesAndStones()
+  {
+    return _movesAndStones;
   }
 }
