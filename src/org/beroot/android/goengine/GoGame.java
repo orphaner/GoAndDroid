@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.beroot.android.util.Point;
+
 /**
  * @author nicolas
- *
+ * 
  */
 public class GoGame
 {
@@ -32,6 +34,24 @@ public class GoGame
    * Moteur de jeu à jour pour le noeud courant
    */
   private Go _goEngine;
+
+  // ------------------------------------------------------------------------
+  // Constructeurs
+  // ------------------------------------------------------------------------
+  public GoGame()
+  {
+  }
+
+  public GoGame(int boardSize, int handicap, String whitePlayerName, String blackPlayerName)
+  {
+    GoNode first = new GoNode();
+    first.addProp(ISgf.SZ, boardSize);
+    first.addProp(ISgf.HA, handicap);
+    // TODO ajout des pierres de handicap
+    first.addProp(ISgf.PB, blackPlayerName);
+    first.addProp(ISgf.PW, whitePlayerName);
+    setFirstNode(first);
+  }
 
   // ------------------------------------------------------------------------
   // Manipulation de l'arbre
@@ -122,7 +142,7 @@ public class GoGame
       _current = result;
     }
   }
-  
+
   /**
    * Annule le dernier coup
    */
@@ -251,6 +271,22 @@ public class GoGame
     }
   }
 
+  public boolean play(Point p)
+  {
+    if (!_goEngine.isLegal(_goEngine.pos(p.x, p.y), _goEngine.getPlayerTurn()))
+    {
+      return false;
+    }
+
+    char x = (char) ('a' + p.x);
+    char y = (char) ('a' + p.y);
+    GoNode node = new GoNode();
+    node.addProp(_goEngine.getPlayerTurn() == Go.BLACK ? ISgf.B : ISgf.W, "" + x + y);
+    _current.setNextNode(node);
+    nextNode();
+    return true;
+  }
+
   // ------------------------------------------------------------------------
   // Récupération de propriété du noeud courant
   // ------------------------------------------------------------------------
@@ -300,7 +336,7 @@ public class GoGame
   {
     return _goEngine;
   }
-  
+
   /**
    * Retourne la liste des pierres de la position finale pour enregistrement en BDD
    * @return

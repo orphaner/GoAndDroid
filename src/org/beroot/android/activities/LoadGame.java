@@ -21,7 +21,7 @@ public class LoadGame extends CommonGame
     Sgf sgf = new Sgf("/sdcard/GoAndDroid/" + file);
     _gg = sgf.load();
 
-    _boardView.setGo(_gg.getGoEngine());
+    _boardView.setGoGame(_gg);
     setPlayerName(_gg.getBlackPlayerName(), R.id.boardBlackPlayerText);
     setPlayerName(_gg.getWhitePlayerName(), R.id.boardWhitePlayerText);
     updateComment();

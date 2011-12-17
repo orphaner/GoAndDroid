@@ -14,7 +14,8 @@ import android.util.Log;
 
 public class BoardViewPreview extends BoardViewCommon
 {
-  private List<InternalStone> stones;
+  private Go _go;
+  private List<InternalStone> _stones;
 
   public BoardViewPreview(Context context)
   {
@@ -48,21 +49,20 @@ public class BoardViewPreview extends BoardViewCommon
 
   public void setStones(String stones)
   {
-    this.stones = new LinkedList<InternalStone>();
-    String splii[];
+    _stones = new LinkedList<InternalStone>();
+    String split[];
     StringTokenizer st = new StringTokenizer(stones, "\\|");
     InternalStone iStone;
     while (st.hasMoreTokens())
     {
       iStone = new InternalStone();
-      splii = st.nextToken().split(":");
-      iStone.color = Byte.parseByte(splii[0]);
-      int pos = Integer.parseInt(splii[1]);
+      split = st.nextToken().split(":");
+      iStone.color = Byte.parseByte(split[0]);
+      int pos = Integer.parseInt(split[1]);
       iStone.pos = pos;
-      this.stones.add(iStone);
+      _stones.add(iStone);
     }
     setDrawingCacheEnabled(false);
-    //invalidate();
   }
 
   public void setBoardSize(int boardSize)
@@ -98,13 +98,13 @@ public class BoardViewPreview extends BoardViewCommon
     Perf perf = new Perf();
     float stoneSize = 2.2f * (19 / _boardSize);
     float px, py;
-    for (InternalStone iStone : stones)
+    for (InternalStone iStone : _stones)
     {
       px = (_go.I(iStone.pos) * _globalCoef) + _globalPadding;
       py = (_go.J(iStone.pos) * _globalCoef) + _globalPadding;
       canvas.drawCircle(px, py, stoneSize, iStone.color == Go.BLACK ? _blackStonePaint : _whiteStonePaint);
     }
-    Log.d("beroot", "Preview.drawStones: " + perf.getTime() + " s" + " - " + stones.size());
+    Log.d("beroot", "Preview.drawStones: " + perf.getTime() + " s" + " - " + _stones.size());
   }
 
   @Override

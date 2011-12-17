@@ -117,7 +117,6 @@ public abstract class CommonGame extends Activity
         _gg.nextNode();
       }
       updateComment();
-      _boardView.setGo(_gg.getGoEngine());
       _boardView.invalidate();
     }
   }
@@ -132,7 +131,6 @@ public abstract class CommonGame extends Activity
         _gg.nextNode();
       }
       updateComment();
-      _boardView.setGo(_gg.getGoEngine());
       _boardView.invalidate();
     }
   }
@@ -147,7 +145,6 @@ public abstract class CommonGame extends Activity
         _gg.undo();
       }
       updateComment();
-      _boardView.setGo(_gg.getGoEngine());
       _boardView.invalidate();
     }
   }
@@ -158,7 +155,6 @@ public abstract class CommonGame extends Activity
     public void onClick(View v)
     {
       _gg.goToFirstNode();
-      _boardView.setGo(_gg.getGoEngine());
       updateComment();
       _boardView.invalidate();
     }

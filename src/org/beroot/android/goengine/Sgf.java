@@ -21,6 +21,17 @@ public class Sgf
     _fileName = fileName;
   }
 
+  public GoGame load(boolean keepFileInMemory)
+  {
+    _keepFileInMemory = keepFileInMemory;
+    return load();
+  }
+
+  public String getFileContent()
+  {
+    return _content;
+  }
+
   public GoGame load()
   {
     Perf perf = new Perf();
@@ -171,7 +182,6 @@ public class Sgf
     {
       _cursor++;
     }
-    //System.out.println("( trouvé à position: " + _cursor);
   }
 
   private boolean eof()
@@ -207,16 +217,5 @@ public class Sgf
     //Sgf sgf = new Sgf("/home/nicolas/android/go/Lee-Changho-vs-Xie-He-20111123.sgf");
     Sgf sgf = new Sgf("/home/nicolas/Documents/go/Kogo's Joseki Dictionary.sgf");
     sgf.load();
-  }
-
-  public GoGame load(boolean keepFileInMemory)
-  {
-    _keepFileInMemory = keepFileInMemory;
-    return load();
-  }
-
-  public String getFileContent()
-  {
-    return _content;
   }
 }

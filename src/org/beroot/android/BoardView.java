@@ -1,6 +1,7 @@
 package org.beroot.android;
 
 import org.beroot.android.goengine.Go;
+import org.beroot.android.goengine.GoGame;
 import org.beroot.android.util.Point;
 
 import android.content.Context;
@@ -40,6 +41,8 @@ public class BoardView extends BoardViewCommon
 
   private int mActivePointerId = INVALID_POINTER_ID;
   private float mScaleFactor = 1.0f;
+  
+  private GoGame _gg;
 
 
   // --------------------------------------------------------------------------
@@ -71,31 +74,16 @@ public class BoardView extends BoardViewCommon
   }
 
 
+  public void setGoGame(GoGame gg)
+  {
+    _gg = gg;
+    _boardSize = _gg.getBoardSize();
+  }
+
+
   // --------------------------------------------------------------------------
   // Phase de jeu
   // --------------------------------------------------------------------------
-  private boolean addStone(Point p)
-  {
-    if (isBlackTurn() && _go.isLegal(_go.pos(p.x, p.y), Go.BLACK))
-    {
-      _go.play(p.x, p.y, Go.BLACK);
-      _moveCount++;
-      return true;
-    }
-    else if (!isBlackTurn() && _go.isLegal(_go.pos(p.x, p.y), Go.WHITE))
-    {
-      _go.play(p.x, p.y, Go.WHITE);
-      _moveCount++;
-      return true;
-    }
-    return false;
-  }
-
-  private boolean isBlackTurn()
-  {
-    return _moveCount % 2 == 0;
-  }
-
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
   {
@@ -173,17 +161,17 @@ public class BoardView extends BoardViewCommon
     // Tracé des pierres
     float reduc = _globalCoef / 1.8f;
 
-    for (int i = _go.boardMin; i < _go.boardMax; i++)
+    for (int i = _gg.getGoEngine().boardMin; i < _gg.getGoEngine().boardMax; i++)
     {
-      if (_go.onBoard(i))
+      if (_gg.getGoEngine().onBoard(i))
       {
-        if (_go._board[i] == Go.WHITE)
+        if (_gg.getGoEngine()._board[i] == Go.WHITE)
         {
-          drawStone(canvas, reduc, _go.I(i), _go.J(i), Go.WHITE);
+          drawStone(canvas, reduc, _gg.getGoEngine().I(i), _gg.getGoEngine().J(i), Go.WHITE);
         }
-        else if (_go._board[i] == Go.BLACK)
+        else if (_gg.getGoEngine()._board[i] == Go.BLACK)
         {
-          drawStone(canvas, reduc, _go.I(i), _go.J(i), Go.BLACK);
+          drawStone(canvas, reduc, _gg.getGoEngine().I(i), _gg.getGoEngine().J(i), Go.BLACK);
         }
       }
     }
@@ -316,7 +304,7 @@ public class BoardView extends BoardViewCommon
           Log.d(TAG, "pressed - x: " + e.getX() + " - y: " + e.getY());
           Log.d(TAG, "point   - x: " + p.x + " - y: " + p.y);
           Log.d(TAG, "traced  - x: " + (int) (((p.x) * _globalCoef) + _globalPadding) + " - y: " + (int) (((p.y) * _globalCoef) + _globalPadding));
-          if (addStone(p))
+          if (_gg.play(p))
           {
             invalidate();
           }

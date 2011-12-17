@@ -115,6 +115,11 @@ public class GoNode
     }
   }
 
+  public void addProp(String key, int value)
+  {
+    addProp(key, "" + value);
+  }
+
   public String getProp(String key)
   {
     if (_props != null && _props.containsKey(key))

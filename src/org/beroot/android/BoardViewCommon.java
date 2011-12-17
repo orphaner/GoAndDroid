@@ -1,6 +1,5 @@
 package org.beroot.android;
 
-import org.beroot.android.goengine.Go;
 import org.beroot.android.goengine.GoConstants;
 import org.beroot.android.util.Point;
 
@@ -37,7 +36,6 @@ public abstract class BoardViewCommon extends View
   // Objets de jeu
   // --------------------------------------------------------------------------
   protected int _boardSize;
-  protected Go _go;
   protected int _moveCount = 0;
 
   // --------------------------------------------------------------------------
@@ -104,13 +102,6 @@ public abstract class BoardViewCommon extends View
       _gobanBackgroundImage.setShader(new BitmapShader(BitmapFactory.decodeResource(_resources, R.drawable.board), Shader.TileMode.MIRROR,
           Shader.TileMode.MIRROR));
     }
-  }
-
-  public void setGo(Go go)
-  {
-    _boardSize = go.getBoardSize();
-    _go = go;
-    postInvalidate();
   }
 
   @Override
