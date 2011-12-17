@@ -115,9 +115,9 @@ public abstract class CommonGame extends Activity
       if (_gg.hasNextNode())
       {
         _gg.nextNode();
+        updateComment();
+        _boardView.invalidate();
       }
-      updateComment();
-      _boardView.invalidate();
     }
   }
 
@@ -143,9 +143,9 @@ public abstract class CommonGame extends Activity
       if (_gg.canUndo())
       {
         _gg.undo();
+        updateComment();
+        _boardView.invalidate();
       }
-      updateComment();
-      _boardView.invalidate();
     }
   }
 
