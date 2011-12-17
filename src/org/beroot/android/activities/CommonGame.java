@@ -48,7 +48,7 @@ public abstract class CommonGame extends Activity
    * 
    */
   protected Button _beginButton;
-  
+
   /**
    * 
    */
@@ -107,7 +107,6 @@ public abstract class CommonGame extends Activity
     }
   }
 
-  
   private class NextButtonListener implements OnClickListener
   {
     @Override
@@ -120,9 +119,9 @@ public abstract class CommonGame extends Activity
       updateComment();
       _boardView.setGo(_gg.getGoEngine());
       _boardView.invalidate();
-    } 
+    }
   }
-  
+
   private class EndButtonListener implements OnClickListener
   {
     @Override
@@ -137,7 +136,7 @@ public abstract class CommonGame extends Activity
       _boardView.invalidate();
     }
   }
-  
+
   private class PrevButtonListener implements OnClickListener
   {
     @Override
@@ -152,7 +151,7 @@ public abstract class CommonGame extends Activity
       _boardView.invalidate();
     }
   }
-  
+
   private class BeginButtonListener implements OnClickListener
   {
     @Override
