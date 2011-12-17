@@ -4,7 +4,6 @@ import org.beroot.android.BoardViewPreview;
 import org.beroot.android.R;
 import org.beroot.android.db.DaoGame;
 import org.beroot.android.db.DbGame;
-import org.beroot.android.goengine.GobanSize;
 import org.beroot.android.util.Perf;
 
 import android.content.Context;
@@ -54,7 +53,6 @@ public class MyGamesAdapter extends BaseAdapter
       vh._whitePlayer = (TextView) view.findViewById(R.id.fileWhitePlayerText);
       vh._blackPlayer = (TextView) view.findViewById(R.id.fileBlackPlayerText);
       vh._boardView = (BoardViewPreview) view.findViewById(R.id.itemBoardView);
-      vh._boardView.setGobanSize(GobanSize.G19); // TODO à mettre en bdd
       view.setTag(vh);
     }
     else
@@ -64,9 +62,10 @@ public class MyGamesAdapter extends BaseAdapter
 
     Perf perf = new Perf();
     DbGame game = (DbGame) getItem(position);
+    vh._boardView.setBoardSize(game.getBoardSize());
+    vh._boardView.setStones(game.getStones());
     vh._whitePlayer.setText(game.getWhitePlayerName());
     vh._blackPlayer.setText(game.getBlackPlayerName());
-    vh._boardView.setStones(game.getStones());
     Log.d("beroot", "Load DbGame: " + perf.getTime() + " s");
     return view;
   }

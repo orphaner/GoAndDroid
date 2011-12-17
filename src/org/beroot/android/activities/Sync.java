@@ -43,6 +43,7 @@ public class Sync
       game = new DbGame();
       game.setWhitePlayerName(gg.getWhitePlayerName());
       game.setBlackPlayerName(gg.getBlackPlayerName());
+      game.setBoardSize(gg.getBoardSize());
       game.setStones(gg.getStonesForBDD());
       game.setResult(gg.getResult());
       game.setFileName(f);

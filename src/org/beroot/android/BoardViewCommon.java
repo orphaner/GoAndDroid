@@ -2,7 +2,6 @@ package org.beroot.android;
 
 import org.beroot.android.goengine.Go;
 import org.beroot.android.goengine.GoConstants;
-import org.beroot.android.goengine.GobanSize;
 import org.beroot.android.util.Point;
 
 import android.content.Context;
@@ -37,7 +36,7 @@ public abstract class BoardViewCommon extends View
   // --------------------------------------------------------------------------
   // Objets de jeu
   // --------------------------------------------------------------------------
-  protected GobanSize _gobanSize;
+  protected int _boardSize;
   protected Go _go;
   protected int _moveCount = 0;
 
@@ -90,6 +89,7 @@ public abstract class BoardViewCommon extends View
   protected void init(Context context)
   {
     _resources = getResources();
+    initDrawObjects();
   }
 
   /**
@@ -108,14 +108,8 @@ public abstract class BoardViewCommon extends View
 
   public void setGo(Go go)
   {
+    _boardSize = go.getBoardSize();
     _go = go;
-  }
-
-  public void setGobanSize(GobanSize gobanSize)
-  {
-    _gobanSize = gobanSize;
-    _go = new Go(_gobanSize.getSize());
-    initDrawObjects();
     postInvalidate();
   }
 
@@ -129,9 +123,9 @@ public abstract class BoardViewCommon extends View
 
     // Tracé des lignes
     boolean isFirstOrLast;
-    for (int i = 0; i < _gobanSize.getSize(); i++)
+    for (int i = 0; i < _boardSize; i++)
     {
-      isFirstOrLast = (i == 0 || i == _gobanSize.getSize() - 1);
+      isFirstOrLast = (i == 0 || i == _boardSize - 1);
       canvas.drawLine((i * _globalCoef) + _globalPadding, _globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding,
           (isFirstOrLast ? _linePaintBig : _linePaint));
       canvas.drawLine(_globalPadding, (i * _globalCoef) + _globalPadding, _lineWidth + _globalPadding, (i * _globalCoef) + _globalPadding,
@@ -139,7 +133,7 @@ public abstract class BoardViewCommon extends View
     }
 
     // Tracé des hoshis
-    for (Point hoshi : GoConstants.getHoshis(_gobanSize))
+    for (Point hoshi : GoConstants.getHoshis(_boardSize))
     {
       canvas.drawCircle(((hoshi.x - 1) * _globalCoef) + _globalPadding, ((hoshi.y - 1) * _globalCoef) + _globalPadding, _hoshiSize, _linePaint);
     }
@@ -158,5 +152,10 @@ public abstract class BoardViewCommon extends View
    */
   protected abstract void drawStone(Canvas canvas, float reduc, int px, int py, byte color);
   
+  /**
+   * Trace toutes les pierres sur le goban
+   * 
+   * @param canvas
+   */
   protected abstract void drawStones(Canvas canvas);
 }

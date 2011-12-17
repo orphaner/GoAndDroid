@@ -2,7 +2,7 @@ package org.beroot.android.activities;
 
 import org.beroot.android.BoardView;
 import org.beroot.android.R;
-import org.beroot.android.goengine.GobanSize;
+import org.beroot.android.goengine.Go;
 import org.beroot.android.util.StringUtils;
 
 import android.app.Activity;
@@ -41,15 +41,15 @@ public class Board extends Activity
     String size = getIntent().getStringExtra(NewGame.BOARD_SIZE);
     if (StringUtils.isEmpty(size) || size.equals("13x13"))
     {
-      _boardView.setGobanSize(GobanSize.G13);
+      _boardView.setGo(new Go(13));
     }
     else if (size.equals("9x9"))
     {
-      _boardView.setGobanSize(GobanSize.G9);
+      _boardView.setGo(new Go(9));
     }
     else if (size.equals("19x19"))
     {
-      _boardView.setGobanSize(GobanSize.G19);
+      _boardView.setGo(new Go(19));
     }
   }
 

@@ -406,6 +406,11 @@ public class Go implements Cloneable
     _firstColorPlay = color;
     _playerTurn = color;
   }
+  
+  public int getBoardSize() 
+  {
+    return maxBoard;
+  }
 
   // ------------------------------------------------------------------------
   // Constructeur

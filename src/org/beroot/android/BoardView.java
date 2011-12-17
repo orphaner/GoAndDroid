@@ -1,7 +1,6 @@
 package org.beroot.android;
 
 import org.beroot.android.goengine.Go;
-import org.beroot.android.goengine.GobanSize;
 import org.beroot.android.util.Point;
 
 import android.content.Context;
@@ -69,7 +68,6 @@ public class BoardView extends BoardViewCommon
     super.init(context);
     _gestureDetector = new GestureDetector(context, new GobanGestureListener());
     _scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
-    setGobanSize(GobanSize.G19);
   }
 
 
@@ -120,10 +118,10 @@ public class BoardView extends BoardViewCommon
 
       // Calcul des mesures
       Log.d(TAG, "Calcul des mesures");
-      _globalCoef = _gobanWidth / _gobanSize.getSize();
+      _globalCoef = _gobanWidth / _boardSize;
       _activeCellWidth = _globalCoef;
-      _lineWidth = _globalCoef * (_gobanSize.getSize() - 1);
-      _backgroundWidth = _globalCoef * _gobanSize.getSize();
+      _lineWidth = _globalCoef * (_boardSize - 1);
+      _backgroundWidth = _globalCoef * _boardSize;
       _globalPadding = _globalCoef / 2;
 
       Bitmap.Config bitmapConfig = Bitmap.Config.ARGB_8888;
@@ -313,7 +311,7 @@ public class BoardView extends BoardViewCommon
       if (!_scaleDetector.isInProgress())
       {
         Point p = coord2Point(e.getX(), e.getY());
-        if (p.x < _gobanSize.getSize() && p.y < _gobanSize.getSize())
+        if (p.x < _boardSize && p.y < _boardSize)
         {
           Log.d(TAG, "pressed - x: " + e.getX() + " - y: " + e.getY());
           Log.d(TAG, "point   - x: " + p.x + " - y: " + p.y);

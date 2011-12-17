@@ -50,6 +50,7 @@ public class DaoGame
     ContentValues values = new ContentValues();
     values.put(SqliteGame.COL_WHITE_PLAYER_NAME, game.getWhitePlayerName());
     values.put(SqliteGame.COL_BLACK_PLAYER_NAME, game.getBlackPlayerName());
+    values.put(SqliteGame.COL_BOARD_SIZE, game.getBoardSize());
     values.put(SqliteGame.COL_RESULT, game.getResult());
     values.put(SqliteGame.COL_STONES, game.getStones());
     values.put(SqliteGame.COL_FILE_NAME, game.getFileName());
@@ -65,6 +66,7 @@ public class DaoGame
           SqliteGame.COL_ID,
           SqliteGame.COL_WHITE_PLAYER_NAME,
           SqliteGame.COL_BLACK_PLAYER_NAME,
+          SqliteGame.COL_BOARD_SIZE,
           SqliteGame.COL_RESULT,
           SqliteGame.COL_STONES,
           SqliteGame.COL_FILE_NAME,
@@ -81,14 +83,16 @@ public class DaoGame
       return null;
     }
     c.moveToFirst();
+    int i = 0;
     DbGame game = new DbGame();
-    game.setId(c.getInt(0));
-    game.setWhitePlayerName(c.getString(1));
-    game.setBlackPlayerName(c.getString(2));
-    game.setResult(c.getString(3));
-    game.setStones(c.getString(4));
-    game.setFileName(c.getString(5));
-    game.setMd5(c.getString(6));
+    game.setId(c.getInt(i++));
+    game.setWhitePlayerName(c.getString(i++));
+    game.setBlackPlayerName(c.getString(i++));
+    game.setBoardSize(c.getInt(i++));
+    game.setResult(c.getString(i++));
+    game.setStones(c.getString(i++));
+    game.setFileName(c.getString(i++));
+    game.setMd5(c.getString(i++));
     c.close();
     return game;
   }

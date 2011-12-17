@@ -1,5 +1,9 @@
 package org.beroot.android;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.beroot.android.goengine.Go;
 import org.beroot.android.util.Perf;
 
@@ -10,7 +14,7 @@ import android.util.Log;
 
 public class BoardViewPreview extends BoardViewCommon
 {
-  private String stones;
+  private List<InternalStone> stones;
 
   public BoardViewPreview(Context context)
   {
@@ -33,13 +37,48 @@ public class BoardViewPreview extends BoardViewCommon
   public void init(Context context)
   {
     super.init(context);
-    _go = new Go(19);
     _hoshiSize = 1.5f;
   }
-  
+
+  private class InternalStone
+  {
+    public byte color;
+    public int pos;
+  }
+
   public void setStones(String stones)
   {
-    this.stones = stones;
+    this.stones = new LinkedList<InternalStone>();
+    String splii[];
+    StringTokenizer st = new StringTokenizer(stones, "\\|");
+    InternalStone iStone;
+    while (st.hasMoreTokens())
+    {
+      iStone = new InternalStone();
+      splii = st.nextToken().split(":");
+      iStone.color = Byte.parseByte(splii[0]);
+      int pos = Integer.parseInt(splii[1]);
+      iStone.pos = pos;
+      this.stones.add(iStone);
+    }
+    setDrawingCacheEnabled(false);
+    //invalidate();
+  }
+
+  public void setBoardSize(int boardSize)
+  {
+    _boardSize = boardSize;
+    _go = new Go(boardSize);
+    calculateMeasure();
+  }
+
+  private void calculateMeasure()
+  {
+    _globalCoef = _gobanWidth / _boardSize;
+    _activeCellWidth = _globalCoef;
+    _lineWidth = _globalCoef * (_boardSize - 1);
+    _backgroundWidth = _globalCoef * _boardSize;
+    _globalPadding = _globalCoef / 2;
   }
 
   @Override
@@ -48,41 +87,35 @@ public class BoardViewPreview extends BoardViewCommon
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     Log.d("beroot", "mesure: " + getWidth() + " / " + getHeight());
 
-    if (getWidth() > 0)
-    {
-      //setMeasuredDimension(getMeasuredHeight(), getMeasuredHeight());
-      setMeasuredDimension(100, 100);
-      _gobanWidth = getMeasuredHeight();
-      _globalCoef = _gobanWidth / _gobanSize.getSize();
-      _activeCellWidth = _globalCoef;
-      _lineWidth = _globalCoef * (_gobanSize.getSize() - 1);
-      _backgroundWidth = _globalCoef * _gobanSize.getSize();
-      _globalPadding = _globalCoef / 2;
-    }
+    setMeasuredDimension(100, 100);
+    _gobanWidth = 100;
+    calculateMeasure();
   }
 
   @Override
   protected void drawStones(Canvas canvas)
   {
     Perf perf = new Perf();
-    String splii[];
-    for (String s : stones.split("\\|"))
+    float stoneSize = 2.2f * (19 / _boardSize);
+    float px, py;
+    for (InternalStone iStone : stones)
     {
-      splii = s.split(":");
-      byte color = Byte.parseByte(splii[0]);
-      int pos = Integer.parseInt(splii[1]);
-      drawStone(canvas, 0, _go.I(pos), _go.J(pos), color);
+      px = (_go.I(iStone.pos) * _globalCoef) + _globalPadding;
+      py = (_go.J(iStone.pos) * _globalCoef) + _globalPadding;
+      canvas.drawCircle(px, py, stoneSize, iStone.color == Go.BLACK ? _blackStonePaint : _whiteStonePaint);
     }
-    Log.d("beroot", "Preview.drawStones: " + perf.getTime() + " s" + " - " + stones.length());
+    Log.d("beroot", "Preview.drawStones: " + perf.getTime() + " s" + " - " + stones.size());
   }
 
   @Override
   protected void drawStone(Canvas canvas, float reduc, int px, int py, byte color)
   {
-    float x;
-    float y;
-    x = (px * _globalCoef) + _globalPadding ;
-    y = (py * _globalCoef) + _globalPadding ;
-    canvas.drawCircle(x, y, 2.2f, color == Go.BLACK ? _blackStonePaint : _whiteStonePaint);
+  }
+
+  @Override
+  public void onDraw(Canvas canvas)
+  {
+    super.onDraw(canvas);
+    setDrawingCacheEnabled(true);
   }
 }

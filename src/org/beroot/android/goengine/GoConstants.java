@@ -41,17 +41,18 @@ public class GoConstants
     hoshis9x9.add(new Point(7, 7));
   }
 
-  public static List<Point> getHoshis(GobanSize gobanSize)
+  public static List<Point> getHoshis(int boardSize)
   {
-    switch (gobanSize.getSize())
+    switch (boardSize)
     {
       case 9:
         return hoshis9x9;
       case 13:
         return hoshis13x13;
       case 19:
-      default:
         return hoshis19x19;
+      default:
+        return new ArrayList<Point>();
     }
   }
 }

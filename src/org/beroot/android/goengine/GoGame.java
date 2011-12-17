@@ -334,4 +334,9 @@ public class GoGame
     }
     return sb.substring(0, sb.length() - 1);
   }
+
+  public int getBoardSize()
+  {
+    return _goEngine.getBoardSize();
+  }
 }

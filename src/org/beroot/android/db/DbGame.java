@@ -5,6 +5,7 @@ public class DbGame
   private int id;
   private String blackPlayerName;
   private String whitePlayerName;
+  private int boardSize;
   private String result;
   private String stones;
   private String fileName;
@@ -14,11 +15,12 @@ public class DbGame
   {
   }
 
-  public DbGame(String blackPlayerName, String whitePlayerName, String result, String stones, String fileName, String md5)
+  public DbGame(String blackPlayerName, String whitePlayerName, int boardSize, String result, String stones, String fileName, String md5)
   {
     super();
     this.blackPlayerName = blackPlayerName;
     this.whitePlayerName = whitePlayerName;
+    this.boardSize = boardSize;
     this.result = result;
     this.stones = stones;
     this.fileName = fileName;
@@ -93,5 +95,15 @@ public class DbGame
   public void setFileName(String fileName)
   {
     this.fileName = fileName;
+  }
+
+  public int getBoardSize()
+  {
+    return boardSize;
+  }
+
+  public void setBoardSize(int boardSize)
+  {
+    this.boardSize = boardSize;
   }
 }
