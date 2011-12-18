@@ -115,7 +115,6 @@ public class Sgf
     char c, lc = '-';
     StringBuffer prop = new StringBuffer();
     StringBuffer value = new StringBuffer();
-    //boolean startValue = false;
     while (!eof())
     {
       c = _content.charAt(_cursor);
@@ -139,7 +138,6 @@ public class Sgf
             node.addProp(prop.toString(), value.toString());
             prop = new StringBuffer();
             value = new StringBuffer();
-            //startValue = false;
             _cursor--;
           }
           else
@@ -149,8 +147,6 @@ public class Sgf
           break;
 
         case '[':
-          //startValue = true;
-
           _cursor++;
           c = _content.charAt(_cursor);
           while (!eof() && (c != ']' || (c == ']' && lc == '\\')))
@@ -164,18 +160,6 @@ public class Sgf
           break;
 
         default:
-          //          if (startValue)
-          //          {
-          //            while (!eof() && (c != ']' || (c == ']' && lc == '\\')))
-          //            {
-          //              value.append(c);
-          //              _cursor++;
-          //              lc = c;
-          //              c = _content.charAt(_cursor);
-          //            }
-          //            _cursor--;
-          //          }
-          //          else 
           if (Character.isUpperCase(c))
           {
             prop.append(c);
@@ -202,11 +186,9 @@ public class Sgf
 
   private void readFile() throws IOException
   {
-    // 1 - Création de la ressource
     FileReader reader = new FileReader(new File(_fileName));
     try
     {
-      // 2 - Utilisation de la ressource
       StringBuffer buffer = new StringBuffer();
       char[] cbuf = new char[2048];
       int len;
@@ -218,7 +200,6 @@ public class Sgf
     }
     finally
     {
-      // 3 - Libération de la ressource
       reader.close();
     }
   }
