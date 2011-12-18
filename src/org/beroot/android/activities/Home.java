@@ -48,8 +48,8 @@ public class Home extends Activity
       @Override
       public void onClick(View v)
       {
-        Sync sync = new Sync();
-        sync.process(getBaseContext());
+        Sync sync = new Sync(Home.this);
+        sync.execute();
       }
     };
 

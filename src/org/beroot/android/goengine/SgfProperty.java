@@ -11,4 +11,9 @@ public class SgfProperty
     this.prop = prop;
     this.value = value;
   }
+
+  public String toString()
+  {
+    return prop + ":" + value;
+  }
 }

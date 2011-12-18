@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.beroot.android.util.Perf;
-
-import android.util.Log;
-
 public class Sgf
 {
   private String _fileName;
@@ -34,7 +30,6 @@ public class Sgf
 
   public GoGame load()
   {
-    Perf perf = new Perf();
     try
     {
       readFile();
@@ -56,8 +51,6 @@ public class Sgf
     {
       _content = null;
     }
-
-    Log.d("beroot", "Load SGF: " + perf.getTime() + "s");
     return _game;
   }
 
@@ -67,20 +60,23 @@ public class Sgf
     while (!eof())
     {
       _cursor++;
-      switch (_content.charAt(_cursor))
+      if (!eof())
       {
-        case ';':
-          _cursor++;
-          node = createNewGoNode(node, first);
-          first = false;
-          break;
+        switch (_content.charAt(_cursor))
+        {
+          case ';':
+            _cursor++;
+            node = createNewGoNode(node, first);
+            first = false;
+            break;
 
-        case '(':
-          buildTree(node);
-          break;
+          case '(':
+            buildTree(node);
+            break;
 
-        case ')':
-          return;
+          case ')':
+            return;
+        }
       }
     }
   }
@@ -117,9 +113,9 @@ public class Sgf
   private GoNode fillProperties(GoNode node)
   {
     char c, lc = '-';
-    String prop = "";
-    String value = "";
-    boolean startValue = false;
+    StringBuffer prop = new StringBuffer();
+    StringBuffer value = new StringBuffer();
+    //boolean startValue = false;
     while (!eof())
     {
       c = _content.charAt(_cursor);
@@ -127,8 +123,11 @@ public class Sgf
       {
         // End Node
         case '(':
-        case ')':
         case ';':
+          _cursor--;
+          return node;
+
+        case ')':
           _cursor--;
           return node;
 
@@ -137,37 +136,49 @@ public class Sgf
           c = _content.charAt(_cursor);
           if (c != '[')
           {
-            node.addProp(prop, value);
-            prop = "";
-            value = "";
-            startValue = false;
+            node.addProp(prop.toString(), value.toString());
+            prop = new StringBuffer();
+            value = new StringBuffer();
+            //startValue = false;
             _cursor--;
           }
           else
           {
-            value += "|";
+            value.append("|");
           }
           break;
 
         case '[':
-          startValue = true;
+          //startValue = true;
+
+          _cursor++;
+          c = _content.charAt(_cursor);
+          while (!eof() && (c != ']' || (c == ']' && lc == '\\')))
+          {
+            value.append(c);
+            _cursor++;
+            lc = c;
+            c = _content.charAt(_cursor);
+          }
+          _cursor--;
           break;
 
         default:
-          if (startValue)
+          //          if (startValue)
+          //          {
+          //            while (!eof() && (c != ']' || (c == ']' && lc == '\\')))
+          //            {
+          //              value.append(c);
+          //              _cursor++;
+          //              lc = c;
+          //              c = _content.charAt(_cursor);
+          //            }
+          //            _cursor--;
+          //          }
+          //          else 
+          if (Character.isUpperCase(c))
           {
-            while (!eof() && (c != ']' || (c == ']' && lc == '\\')))
-            {
-              value += c;
-              _cursor++;
-              lc = c;
-              c = _content.charAt(_cursor);
-            }
-            _cursor--;
-          }
-          else if (Character.isUpperCase(c))
-          {
-            prop += c;
+            prop.append(c);
           }
           break;
       }
@@ -214,8 +225,7 @@ public class Sgf
 
   public static void main(String args[])
   {
-    //Sgf sgf = new Sgf("/home/nicolas/android/go/Lee-Changho-vs-Xie-He-20111123.sgf");
-    Sgf sgf = new Sgf("/home/nicolas/Documents/go/Kogo's Joseki Dictionary.sgf");
+    Sgf sgf = new Sgf("/home/nicolas/Documents/go/goproblemsSGF/15242.sgf");
     sgf.load();
   }
 }

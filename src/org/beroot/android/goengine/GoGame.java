@@ -70,8 +70,13 @@ public class GoGame
     String sz = _current.getProp(ISgf.SZ);
     if (sz != null)
     {
-      int size = Integer.parseInt(sz);
-      _goEngine = new Go(size);
+      // TODO rétablir ?
+      //int size = Integer.parseInt(sz);
+      _goEngine = new Go(19);
+    }
+    else
+    {
+      _goEngine = new Go(19);
     }
 
     // Affectation du joueur qui doit jouer
@@ -106,7 +111,7 @@ public class GoGame
     }
 
     _goEngineInitial = _goEngine.clone();
-    addMovesAndStones();
+    addMovesAndStones(); // TODO supprimer pour les perfs au chargement SGF !
   }
 
   /**
@@ -343,11 +348,20 @@ public class GoGame
    */
   public String getStonesForBDD()
   {
-    StringBuilder sb = new StringBuilder();
+    StringBuffer sb = new StringBuffer();
+    //addMovesAndStones();
     while (hasNextNode())
     {
-      nextNode();
+      _current = _current.getNextNode();
+      if (_current.getMovesAndStones() != null)
+      {
+        for (SgfProperty sgfProp : _current.getMovesAndStones())
+        {
+          _goEngine.addStone(sgfProp.value, _goEngine.getPlayerTurn());
+        }
+      }
     }
+    _goEngine.newPosition();
     for (int i = _goEngine.boardMin; i < _goEngine.boardMax; i++)
     {
       if (_goEngine.onBoard(i))
@@ -368,7 +382,11 @@ public class GoGame
         }
       }
     }
-    return sb.substring(0, sb.length() - 1);
+    if (sb.length() > 1)
+    {
+      return sb.substring(0, sb.length() - 1);
+    }
+    return "";
   }
 
   public int getBoardSize()

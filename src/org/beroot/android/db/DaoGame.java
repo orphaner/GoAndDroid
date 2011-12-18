@@ -1,5 +1,7 @@
 package org.beroot.android.db;
 
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -95,5 +97,16 @@ public class DaoGame
     game.setMd5(c.getString(i++));
     c.close();
     return game;
+  }
+
+  public void bulkInsert(List<DbGame> sgfs)
+  {
+    bdd.beginTransaction();
+    for (DbGame g : sgfs)
+    {
+      insert(g);
+    }
+    bdd.setTransactionSuccessful();
+    bdd.endTransaction();
   }
 }
