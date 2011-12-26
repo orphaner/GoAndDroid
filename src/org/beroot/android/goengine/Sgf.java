@@ -9,18 +9,30 @@ public class Sgf
   private String _fileName;
   private GoGame _game;
   private String _content;
-  private int _cursor = 0;
-  private boolean _keepFileInMemory = false;
+  private int _cursor;
+
+  public Sgf()
+  {
+  }
 
   public Sgf(String fileName)
   {
     _fileName = fileName;
   }
 
-  public GoGame load(boolean keepFileInMemory)
+  public void setFileName(String fileName)
   {
-    _keepFileInMemory = keepFileInMemory;
-    return load();
+    _fileName = fileName;
+  }
+
+  public GoGame loadTsumego()
+  {
+    return load(true, true);
+  }
+
+  public GoGame loadGame()
+  {
+    return load(false, false);
   }
 
   public String getFileContent()
@@ -28,7 +40,7 @@ public class Sgf
     return _content;
   }
 
-  public GoGame load()
+  private GoGame load(boolean keepFileInMemory, boolean readOnlyHeader)
   {
     try
     {
@@ -39,15 +51,35 @@ public class Sgf
       ioe.printStackTrace();
       return null;
     }
+    _cursor = 0;
     _game = new GoGame();
 
-    while (!eof())
+    if (readOnlyHeader && !eof())
     {
       findOpenParentesis();
-      buildTree(null);
+      _cursor++;
+      _cursor++;
+      GoNode node = createNewGoNode(null, true);
+      if (!_game.hasMovesAndStones())
+      {
+        while (!eof() && _content.charAt(_cursor) != ';')
+        {
+          _cursor++;
+        }
+        _cursor++;
+        createNewGoNode(node, false);
+      }
+    }
+    else
+    {
+      while (!eof())
+      {
+        findOpenParentesis();
+        buildTree(null);
+      }
     }
 
-    if (!_keepFileInMemory)
+    if (!keepFileInMemory)
     {
       _content = null;
     }
@@ -143,6 +175,7 @@ public class Sgf
           else
           {
             value.append("|");
+            _cursor--;
           }
           break;
 
@@ -206,7 +239,8 @@ public class Sgf
 
   public static void main(String args[])
   {
-    Sgf sgf = new Sgf("/home/nicolas/Documents/go/goproblemsSGF/15242.sgf");
-    sgf.load();
+    Sgf sgf = new Sgf("/home/nicolas/Documents/go/goproblemsSGF/696.sgf");
+    GoGame go = sgf.loadTsumego();
+    go.getStonesForBDD();
   }
 }

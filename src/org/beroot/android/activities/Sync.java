@@ -48,6 +48,7 @@ public class Sync extends AsyncTask<String, Void, Boolean>
   protected Boolean doInBackground(String... params)
   {
     List<DbGame> sgfs = new ArrayList<DbGame>();
+    List<String> errors = new ArrayList<String>();
     File dir = new File("/sdcard/GoAndDroid/");
     String[] files = dir.list();
     DbGame game;
@@ -62,17 +63,17 @@ public class Sync extends AsyncTask<String, Void, Boolean>
     {
       e.printStackTrace();
     }
+    Sgf sgf = new Sgf();
     for (String f : files)
     {
-      Log.d("beroot", "SYNC: " + f);
-
       try
       {
-        Sgf sgf = new Sgf("/sdcard/GoAndDroid/" + f);
-        GoGame gg = sgf.load(true);
+        sgf.setFileName("/sdcard/GoAndDroid/" + f);
+        GoGame gg = sgf.loadTsumego();
 
         game = new DbGame();
-        game.setWhitePlayerName(gg.getWhitePlayerName());
+        //game.setWhitePlayerName(gg.getWhitePlayerName());
+        game.setWhitePlayerName(f);
         game.setBlackPlayerName(gg.getBlackPlayerName());
         game.setBoardSize(gg.getBoardSize());
         game.setStones(gg.getStonesForBDD());
@@ -88,7 +89,9 @@ public class Sync extends AsyncTask<String, Void, Boolean>
       }
       catch (Exception e)
       {
+        Log.d("beroot", "SYNC: " + f);
         e.printStackTrace();
+        errors.add(f);
       }
       _progressDialog.incrementProgressBy(1);
     }
@@ -100,6 +103,7 @@ public class Sync extends AsyncTask<String, Void, Boolean>
     daoGame.bulkInsert(sgfs);
     daoGame.close();
     Log.d("beroot", "TOTALSYNC2: " + perf2.getTime() + " s - ");
+    Log.d("beroot", "Errors: " + errors);
     return true;
   }
 }

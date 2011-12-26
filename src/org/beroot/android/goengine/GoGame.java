@@ -111,7 +111,7 @@ public class GoGame
     }
 
     _goEngineInitial = _goEngine.clone();
-    addMovesAndStones(); // TODO supprimer pour les perfs au chargement SGF !
+    addMovesAndStones(); // TODO supprimer pour les perfs au chargement SGF ??!
   }
 
   /**
@@ -349,17 +349,11 @@ public class GoGame
   public String getStonesForBDD()
   {
     StringBuffer sb = new StringBuffer();
-    //addMovesAndStones();
+    goToFirstNode();
     while (hasNextNode())
     {
       _current = _current.getNextNode();
-      if (_current.getMovesAndStones() != null)
-      {
-        for (SgfProperty sgfProp : _current.getMovesAndStones())
-        {
-          _goEngine.addStone(sgfProp.value, _goEngine.getPlayerTurn());
-        }
-      }
+      addMovesAndStones();
     }
     _goEngine.newPosition();
     for (int i = _goEngine.boardMin; i < _goEngine.boardMax; i++)
@@ -392,5 +386,10 @@ public class GoGame
   public int getBoardSize()
   {
     return _goEngine.getBoardSize();
+  }
+
+  public boolean hasMovesAndStones()
+  {
+    return _current.getMovesAndStones() != null;
   }
 }
