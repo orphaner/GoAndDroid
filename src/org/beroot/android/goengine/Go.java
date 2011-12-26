@@ -366,6 +366,21 @@ public class Go implements Cloneable
     System.out.println("");
     System.out.println("");
   }
+  
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < boardSize; i++)
+    {
+      if (i > 0 && i % (maxBoard + 1) == 0)
+      {
+        sb.append("\n");
+      }
+      sb.append(_board[i] + " ");
+    }
+    
+    return sb.toString();
+  }
 
   /**
 	 * 
@@ -510,18 +525,18 @@ public class Go implements Cloneable
     int s = 0;
     int capturedStones = 0;
 
-    _playerTurn = otherColor(color);
-    _lastKoPos = 0;
-    _board[pos] = color;
-    _stringNumber[pos] = -1;
-    _markString++;
-
     if (!isCalculed)
     {
       newPosition();
       isCalculed = true;
       _markString++;
     }
+
+    _playerTurn = otherColor(color);
+    _lastKoPos = 0;
+    _board[pos] = color;
+    _stringNumber[pos] = -1;
+    _markString++;
 
     // 2 - Parcours des 4 directions cardinales
     int direction;
