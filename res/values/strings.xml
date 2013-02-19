@@ -12,7 +12,7 @@
     <string name="newGameRightArrow">></string>
     <string name="newGameKomi">Komi</string>
     <string name="newGameBlackName">Black Name</string>
-    <string name="newGameWhiteName">White Namer</string>
+    <string name="newGameWhiteName">White Name</string>
     <string name="newGameHandicap">Handicap</string>
     <string name="boardPrevButton">&lt;</string>
     <string name="boardNextButton">></string>

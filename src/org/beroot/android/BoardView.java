@@ -2,6 +2,7 @@ package org.beroot.android;
 
 import org.beroot.android.goengine.Go;
 import org.beroot.android.goengine.GoGame;
+import org.beroot.android.goengine.SgfMarker;
 import org.beroot.android.util.Point;
 
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
+import android.graphics.Paint.FontMetrics;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -27,7 +29,7 @@ public class BoardView extends BoardViewCommon
 
   protected Bitmap _whiteStoneImage;
   protected Bitmap _blackStoneImage;
-  
+
   private GestureDetector _gestureDetector;
   private ScaleGestureDetector _scaleDetector;
 
@@ -41,9 +43,8 @@ public class BoardView extends BoardViewCommon
 
   private int mActivePointerId = INVALID_POINTER_ID;
   private float mScaleFactor = 1.0f;
-  
-  private GoGame _gg;
 
+  private GoGame _gg;
 
   // --------------------------------------------------------------------------
   // Initialisation
@@ -73,13 +74,11 @@ public class BoardView extends BoardViewCommon
     _scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
   }
 
-
   public void setGoGame(GoGame gg)
   {
     _gg = gg;
     _boardSize = _gg.getBoardSize();
   }
-
 
   // --------------------------------------------------------------------------
   // Phase de jeu
@@ -126,7 +125,8 @@ public class BoardView extends BoardViewCommon
       final Paint paint = new Paint(_xferModePaintSrc);
       paint.setStyle(Paint.Style.FILL);
       paint.setFlags(Paint.ANTI_ALIAS_FLAG);
-      final float circleHighlight = stoneCenter - stoneCenter / 3, radiusHighlight = stoneCenter / 3;
+      final float circleHighlight = stoneCenter - stoneCenter / 3;
+      final float radiusHighlight = stoneCenter / 3;
       final int blackStoneColor = _resources.getColor(R.color.blackStoneColor);
       paint.setShader(new RadialGradient(circleHighlight, circleHighlight, radiusHighlight, _resources.getColor(R.color.blackStoneHighlightColor),
           blackStoneColor, Shader.TileMode.CLAMP));
@@ -140,6 +140,9 @@ public class BoardView extends BoardViewCommon
           .getColor(R.color.whiteStoneHighlightColor), Shader.TileMode.CLAMP));
       shape.draw(canvas2, paint);
       //Paint blackPaint = new Paint(paint);
+
+      _whiteTextPaint.setTextSize(_activeCellWidth / 1.2f);
+      _blackTextPaint.setTextSize(_activeCellWidth / 1.2f);
     }
   }
 
@@ -152,6 +155,35 @@ public class BoardView extends BoardViewCommon
 
     super.onDraw(canvas);
 
+    // Tracé des marques
+    if (_gg.getMarks() != null)
+    {
+      FontMetrics fm = _whiteTextPaint.getFontMetrics();
+      float x;
+      float y;
+      int pos;
+      Paint paint;
+      for (SgfMarker mark : _gg.getMarks())
+      {
+        pos = _gg.getGoEngine().pos(mark.x, mark.y);
+        paint = _whiteTextPaint;
+        if (_gg.getGoEngine().onBoard(pos))
+        {
+          if (_gg.getGoEngine()._board[pos] == Go.WHITE)
+          {
+            paint = _whiteTextPaint;
+          }
+          else if (_gg.getGoEngine()._board[pos] == Go.BLACK)
+          {
+            paint = _blackTextPaint;
+          }
+        }
+        x = (mark.x * _globalCoef) + _globalPadding;
+        y = ((mark.y + 1) * _globalCoef)  + _globalPadding + fm.top + fm.descent;
+        canvas.drawText(mark.text, x, y, paint);
+      }
+    }
+
     canvas.restore();
   }
 
@@ -159,7 +191,7 @@ public class BoardView extends BoardViewCommon
   protected void drawStones(Canvas canvas)
   {
     // Tracé des pierres
-    float reduc = _globalCoef / 1.8f;
+    float reduc = _globalCoef / 2f;
 
     for (int i = _gg.getGoEngine().boardMin; i < _gg.getGoEngine().boardMax; i++)
     {
@@ -167,18 +199,26 @@ public class BoardView extends BoardViewCommon
       {
         if (_gg.getGoEngine()._board[i] == Go.WHITE)
         {
-          drawStone(canvas, reduc, _gg.getGoEngine().I(i), _gg.getGoEngine().J(i), Go.WHITE);
+          drawStone(canvas, reduc, _gg.getGoEngine().I(i), _gg.getGoEngine().J(i), Go.WHITE, i);
         }
         else if (_gg.getGoEngine()._board[i] == Go.BLACK)
         {
-          drawStone(canvas, reduc, _gg.getGoEngine().I(i), _gg.getGoEngine().J(i), Go.BLACK);
+          drawStone(canvas, reduc, _gg.getGoEngine().I(i), _gg.getGoEngine().J(i), Go.BLACK, i);
         }
       }
     }
   }
 
-  @Override
-  protected void drawStone(Canvas canvas, float reduc, int px, int py, byte color)
+  /**
+   * Trace une pierre sur le goban
+   * 
+   * @param canvas
+   * @param reduc
+   * @param px
+   * @param py
+   * @param stone
+   */
+  protected void drawStone(Canvas canvas, float reduc, int px, int py, byte color, int pos)
   {
     float x;
     float y;
@@ -187,6 +227,13 @@ public class BoardView extends BoardViewCommon
     Matrix matrix = new Matrix();
     matrix.postTranslate(x, y);
     canvas.drawBitmap(color == Go.BLACK ? _blackStoneImage : _whiteStoneImage, matrix, null);
+
+    // Marquer la dernière pierre posée
+    if (_gg.getGoEngine().isLast(pos))
+    {
+      canvas.drawLine(x + reduc * 0.4f, y + reduc, x + reduc + reduc * 0.6f, y + reduc, color == Go.BLACK ? _blackCirclePaint : _whiteCirclePaint);
+      canvas.drawLine(x + reduc, y + reduc * 0.4f, x + reduc, y + reduc + reduc * 0.6f, color == Go.BLACK ? _blackCirclePaint : _whiteCirclePaint);
+    }
   }
 
   /**

@@ -32,11 +32,11 @@
             <TextView
                 android:id="@+id/fileWhitePlayerText"
                 android:layout_width="fill_parent"
-                android:layout_height="50px"
+                android:layout_height="25px"
                 android:layout_weight="12"
                 android:gravity="fill_horizontal"
                 android:text="White Player"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
 
         <LinearLayout
@@ -56,12 +56,21 @@
             <TextView
                 android:id="@+id/fileBlackPlayerText"
                 android:layout_width="fill_parent"
-                android:layout_height="50px"
+                android:layout_height="25px"
                 android:layout_weight="12"
                 android:gravity="fill_horizontal"
                 android:text="Black Player"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
         </LinearLayout>
+            <TextView
+                android:id="@+id/fileResultText"
+                android:layout_width="fill_parent"
+                android:layout_height="25px"
+                android:layout_weight="12"
+                android:gravity="fill_horizontal"
+                android:text="Result"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
     
     <!--

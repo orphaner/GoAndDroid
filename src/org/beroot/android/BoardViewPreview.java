@@ -108,11 +108,6 @@ public class BoardViewPreview extends BoardViewCommon
   }
 
   @Override
-  protected void drawStone(Canvas canvas, float reduc, int px, int py, byte color)
-  {
-  }
-
-  @Override
   public void onDraw(Canvas canvas)
   {
     super.onDraw(canvas);

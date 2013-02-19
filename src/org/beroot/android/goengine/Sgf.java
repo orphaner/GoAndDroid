@@ -32,7 +32,7 @@ public class Sgf
 
   public GoGame loadGame()
   {
-    return load(false, false);
+    return load(true, false);
   }
 
   public String getFileContent()
@@ -240,7 +240,8 @@ public class Sgf
   public static void main(String args[])
   {
     Sgf sgf = new Sgf("/home/nicolas/Documents/go/goproblemsSGF/696.sgf");
-    GoGame go = sgf.loadTsumego();
+    sgf.setFileName("/home/nicolas/android/go/marks.sgf");
+    GoGame go = sgf.loadGame();
     go.getStonesForBDD();
   }
 }

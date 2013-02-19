@@ -2,6 +2,7 @@ package org.beroot.android.goengine;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.beroot.android.util.Point;
@@ -391,5 +392,75 @@ public class GoGame
   public boolean hasMovesAndStones()
   {
     return _current.getMovesAndStones() != null;
+  }
+
+  public List<SgfMarker> getMarks()
+  {
+    List<SgfProperty> list = _current.getMarks();
+    if (list == null)
+    {
+      return null;
+    }
+    List<SgfMarker> result = new LinkedList<SgfMarker>();
+    String[] split;
+    for (SgfProperty prop : list)
+    {
+      for (String move : prop.value.split("\\|"))
+      {
+        if (prop.prop.equals("LB"))
+        {
+          split = move.split(":");
+          result.add(new SgfMarker(_goEngine.I(split[0]), _goEngine.J(split[0]), split[1]));
+        }
+        else
+        {
+          if (move.length() == 2)
+          {
+            result.add(new SgfMarker(_goEngine.I(move), _goEngine.J(move), transformMark(prop.prop, move)));
+          }
+          else if (move.length() == 5)
+          {
+            String moves[] = move.split(":");
+            char x1 = moves[0].charAt(0);
+            char y1 = moves[0].charAt(1);
+            char x2 = moves[1].charAt(0);
+            char y2 = moves[1].charAt(1);
+            for (char c1 = x1; c1 <= x2; c1++)
+            {
+              for (char c2 = y1; c2 <= y2; c2++)
+              {
+                result.add(new SgfMarker(_goEngine.I("" + c1 + c2), _goEngine.J("" + c1 + c2), transformMark(prop.prop, move)));
+              }
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  private String transformMark(String prop, String mark)
+  {
+    if (prop.equals("LB"))
+    {
+      return mark;
+    }
+    else if (prop.equals("MA"))
+    {
+      return "X";
+    }
+    else if (prop.equals("TR"))
+    {
+      return "\u25b3";
+    }
+    else if (prop.equals("SQ"))
+    {
+      return "\u25a1";
+    }
+    else if (prop.equals("CR"))
+    {
+      return "\u25cb";
+    }
+    return mark;
   }
 }

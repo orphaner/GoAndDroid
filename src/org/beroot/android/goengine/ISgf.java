@@ -514,4 +514,9 @@ public interface ISgf
    * Liste des propriétés représentant des coups ou des ajouts/suppression de pierres
    */
   public static final Set<String> MOVES_PROP = new HashSet<String>(Arrays.asList(new String[] { W, B, AB, AW, AE }));
+
+  /**
+   * Liste des propriétés représentant des marques à afficher sur le goban et/ou les pierres
+   */
+  public static final Set<String> MARKS_PROP = new HashSet<String>(Arrays.asList(new String[] { LB, SQ, CR, AR, LN, MA, SQ, TR }));
 }

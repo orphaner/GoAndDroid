@@ -52,6 +52,7 @@ public class MyGamesAdapter extends BaseAdapter
       view = _inflater.inflate(R.layout.itemsgf, null);
       vh._whitePlayer = (TextView) view.findViewById(R.id.fileWhitePlayerText);
       vh._blackPlayer = (TextView) view.findViewById(R.id.fileBlackPlayerText);
+      vh._result = (TextView) view.findViewById(R.id.fileResultText);
       vh._boardView = (BoardViewPreview) view.findViewById(R.id.itemBoardView);
       view.setTag(vh);
     }
@@ -64,6 +65,7 @@ public class MyGamesAdapter extends BaseAdapter
     DbGame game = (DbGame) getItem(position);
     vh._boardView.setBoardSize(game.getBoardSize());
     vh._boardView.setStones(game.getStones());
+    vh._result.setText(game.getResult());
     vh._whitePlayer.setText(game.getWhitePlayerName());
     vh._blackPlayer.setText(game.getBlackPlayerName());
     Log.d("beroot", "Load DbGame: " + perf.getTime() + " s");
@@ -74,6 +76,7 @@ public class MyGamesAdapter extends BaseAdapter
   {
     TextView _whitePlayer;
     TextView _blackPlayer;
+    TextView _result;
     BoardViewPreview _boardView;
   }
 }

@@ -27,6 +27,10 @@ public abstract class BoardViewCommon extends View
   protected static final Paint _linePaintBig;
   protected static final Paint _whiteStonePaint;
   protected static final Paint _blackStonePaint;
+  protected static final Paint _blackCirclePaint;
+  protected static final Paint _whiteCirclePaint;
+  protected static final Paint _blackTextPaint;
+  protected static final Paint _whiteTextPaint;
   protected int _globalCoef;
   protected int _lineWidth;
   protected int _backgroundWidth;
@@ -43,7 +47,7 @@ public abstract class BoardViewCommon extends View
   // --------------------------------------------------------------------------
   protected Resources _resources;
 
-  protected float _hoshiSize = 5;
+  protected float _hoshiSize = 3;
 
   static
   {
@@ -67,6 +71,31 @@ public abstract class BoardViewCommon extends View
     _whiteStonePaint.setAntiAlias(true);
     _whiteStonePaint.setARGB(255, 255, 255, 255);
     _whiteStonePaint.setStrokeWidth(0.8f);
+
+    _blackCirclePaint = new Paint();
+    _blackCirclePaint.setAntiAlias(true);
+    _blackCirclePaint.setARGB(220, 230, 230, 230);
+    _blackCirclePaint.setStrokeWidth(2.3f);
+
+    _whiteCirclePaint = new Paint();
+    _whiteCirclePaint.setAntiAlias(true);
+    _whiteCirclePaint.setARGB(150, 0, 0, 0);
+    _whiteCirclePaint.setStrokeWidth(2.3f);
+
+    _blackTextPaint = new Paint();
+    _blackTextPaint.setAntiAlias(true);
+    _blackTextPaint.setARGB(255, 230, 230, 230);
+    _blackTextPaint.setTextAlign(Paint.Align.CENTER);
+
+    _whiteTextPaint = new Paint();
+    _whiteTextPaint.setAntiAlias(true);
+    _whiteTextPaint.setARGB(255, 0, 0, 0);
+    _whiteTextPaint.setTextAlign(Paint.Align.CENTER);
+
+//    _whiteTextPaint = new Paint();
+//    _whiteTextPaint.setColor(0xFFFFFFFF);
+//    _whiteTextPaint.setAntiAlias(true);
+//    _whiteTextPaint.setTextAlign(Paint.Align.CENTER);
   }
 
   public BoardViewCommon(Context context, AttributeSet attrs, int defStyle)
@@ -108,7 +137,7 @@ public abstract class BoardViewCommon extends View
   public void onDraw(Canvas canvas)
   {
     super.onDraw(canvas);
-    
+
     // Image de fond
     canvas.drawRect(0, 0, _backgroundWidth, _backgroundWidth, _gobanBackgroundImage);
 
@@ -128,21 +157,10 @@ public abstract class BoardViewCommon extends View
     {
       canvas.drawCircle(((hoshi.x - 1) * _globalCoef) + _globalPadding, ((hoshi.y - 1) * _globalCoef) + _globalPadding, _hoshiSize, _linePaint);
     }
-    
+
     drawStones(canvas);
   }
 
-  /**
-   * Trace une pierre sur le goban
-   * 
-   * @param canvas
-   * @param reduc
-   * @param px
-   * @param py
-   * @param stone
-   */
-  protected abstract void drawStone(Canvas canvas, float reduc, int px, int py, byte color);
-  
   /**
    * Trace toutes les pierres sur le goban
    * 

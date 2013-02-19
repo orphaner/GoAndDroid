@@ -96,6 +96,11 @@ public class Go implements Cloneable
   private int _capturedBlack;
 
   /**
+   * Dernière position
+   */
+  private int _lastPos;
+
+  /**
    * Dernière position d'un KO
    */
   private int _lastKoPos;
@@ -193,7 +198,7 @@ public class Go implements Cloneable
    * @param move
    * @return
    */
-  private int J(String move)
+  public int J(String move)
   {
     return (int) (move.charAt(1) - 'a');
   }
@@ -202,7 +207,7 @@ public class Go implements Cloneable
    * @param move
    * @return
    */
-  private int I(String move)
+  public int I(String move)
   {
     return (int) (move.charAt(0) - 'a');
   }
@@ -534,6 +539,7 @@ public class Go implements Cloneable
 
     _playerTurn = otherColor(color);
     _lastKoPos = 0;
+    _lastPos = pos;
     _board[pos] = color;
     _stringNumber[pos] = -1;
     _markString++;
@@ -976,5 +982,10 @@ public class Go implements Cloneable
       e.printStackTrace();
     }
     return go;
+  }
+
+  public boolean isLast(int i)
+  {
+    return i == _lastPos;
   }
 }

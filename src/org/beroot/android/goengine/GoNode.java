@@ -35,6 +35,11 @@ public class GoNode
    */
   private List<SgfProperty> _movesAndStones;
 
+  /**
+   * Liste des marques du noeud courant
+   */
+  private List<SgfProperty> _marks;
+
   // ------------------------------------------------------------------------
   // Manipulation de la liste chainée
   // ------------------------------------------------------------------------
@@ -104,6 +109,15 @@ public class GoNode
       }
       _movesAndStones.add(new SgfProperty(key, value));
     }
+    // Ajout d'une marque
+    if (ISgf.MARKS_PROP.contains(key))
+    {
+      if (_marks == null)
+      {
+        _marks = new LinkedList<SgfProperty>();
+      }
+      _marks.add(new SgfProperty(key, value));
+    }
     // Ajout d'une propriété
     else
     {
@@ -132,5 +146,10 @@ public class GoNode
   public List<SgfProperty> getMovesAndStones()
   {
     return _movesAndStones;
+  }
+
+  public List<SgfProperty> getMarks()
+  {
+    return _marks;
   }
 }

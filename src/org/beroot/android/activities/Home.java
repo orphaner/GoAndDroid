@@ -49,7 +49,8 @@ public class Home extends Activity
       public void onClick(View v)
       {
         Sync sync = new Sync(Home.this);
-        sync.execute();
+        //sync.execute(Sync.TSUMEGO);
+        sync.execute(Sync.GAMES);
       }
     };
 

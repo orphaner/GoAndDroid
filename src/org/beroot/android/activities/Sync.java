@@ -18,11 +18,27 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+
+/**
+ * - prévoir 2 map : indéxé par nom de fichier et une indexée par somme MD5
+ * - supprimer de la base les fichiers supprimés (pas les fichers dont la somme MD5 a changée) 
+ * - si la somme MD5 a changé, update bdd
+ * - si somme MD5 inchangée mais fichier renommé, update bdd
+ * - si nouveau fichier insérer
+ * - supprimer le truncate
+ */
+
 public class Sync extends AsyncTask<String, Void, Boolean>
 {
+  protected static final String GAMES = "1";
+
+  protected static final String TSUMEGO = "2";
+
   private ProgressDialog _progressDialog;
 
   private Context _context;
+
+  private DbGame loadedGame = null;
 
   public Sync(Context context)
   {
@@ -62,35 +78,39 @@ public class Sync extends AsyncTask<String, Void, Boolean>
     catch (NoSuchAlgorithmException e)
     {
       e.printStackTrace();
+      return false;
     }
     Sgf sgf = new Sgf();
+    String md5 = "";
     for (String f : files)
     {
       try
       {
-        sgf.setFileName("/sdcard/GoAndDroid/" + f);
-        GoGame gg = sgf.loadTsumego();
-
         game = new DbGame();
-        //game.setWhitePlayerName(gg.getWhitePlayerName());
-        game.setWhitePlayerName(f);
-        game.setBlackPlayerName(gg.getBlackPlayerName());
-        game.setBoardSize(gg.getBoardSize());
-        game.setStones(gg.getStonesForBDD());
-        game.setResult(gg.getResult());
-        game.setFileName(f);
-        if (digest != null)
+        sgf.setFileName("/sdcard/GoAndDroid/" + f); // TODO chemins à paramétrer
+        GoGame gg = sgf.loadGame();
+        
+        // Calcul du MD5
+        digest.update(sgf.getFileContent().getBytes());
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        md5 = bigInt.toString(16);
+
+        if (fileNeedUpdate(f, md5))
         {
-          digest.update(sgf.getFileContent().getBytes());
-          BigInteger bigInt = new BigInteger(1, digest.digest());
-          game.setMd5(bigInt.toString(16));
+          game.setWhitePlayerName(gg.getWhitePlayerName());
+          //game.setWhitePlayerName(f);
+          game.setBlackPlayerName(gg.getBlackPlayerName());
+          game.setBoardSize(gg.getBoardSize());
+          game.setStones(gg.getStonesForBDD());
+          game.setResult(gg.getResult());
+          game.setFileName(f);
+          game.setMd5(md5);
+          sgfs.add(game);
         }
-        sgfs.add(game);
       }
       catch (Exception e)
       {
-        Log.d("beroot", "SYNC: " + f);
-        e.printStackTrace();
+        Log.d("beroot", "SYNC: " + f, e);
         errors.add(f);
       }
       _progressDialog.incrementProgressBy(1);
@@ -104,6 +124,11 @@ public class Sync extends AsyncTask<String, Void, Boolean>
     daoGame.close();
     Log.d("beroot", "TOTALSYNC2: " + perf2.getTime() + " s - ");
     Log.d("beroot", "Errors: " + errors);
+    return true;
+  }
+
+  private boolean fileNeedUpdate(String filename, String md5)
+  {
     return true;
   }
 }

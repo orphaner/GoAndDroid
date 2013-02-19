@@ -77,6 +77,18 @@ public class DaoGame
     /* @formatter:on */
     return cursorToLivre(c);
   }
+  
+  public Cursor getGamesForSync() {
+    /* @formatter:off */
+    Cursor c = bdd.query(SqliteGame.TABLE_NAME,
+        new String[] {
+          SqliteGame.COL_ID,
+          SqliteGame.COL_FILE_NAME,
+          SqliteGame.COL_MD5},
+        null, null, null, null, null);
+    /* @formatter:on */
+    return null;
+  }
 
   private DbGame cursorToLivre(Cursor c)
   {
